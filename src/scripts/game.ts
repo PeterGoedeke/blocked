@@ -1,5 +1,6 @@
 import 'phaser'
 import MainScene from './scenes/mainScene'
+import LevelScene from './scenes/LevelScene'
 import PreloadScene from './scenes/preloadScene'
 
 const DEFAULT_WIDTH = 1280
@@ -13,20 +14,17 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: DEFAULT_WIDTH,
-        height: DEFAULT_HEIGHT,
+        height: DEFAULT_HEIGHT
     },
-    scene: [PreloadScene, MainScene],
+    scene: [PreloadScene, LevelScene],
     physics: {
         default: 'arcade',
         arcade: {
-            debug: false,
-            gravity: { y: 400 },
-        },
-    },
+            debug: false
+        }
+    }
 }
 
 window.addEventListener('load', () => {
     const game = new Phaser.Game(config)
 })
-
-console.log('yeet')

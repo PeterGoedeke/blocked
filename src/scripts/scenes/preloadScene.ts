@@ -6,10 +6,21 @@ export default class PreloadScene extends Phaser.Scene {
     preload() {
         this.load.image('phaser-logo', 'assets/img/phaser-logo.png')
         this.load.image('block', 'assets/img/block.png')
+        this.load.image('player', 'assets/img/player.png')
     }
 
     create() {
-        this.scene.start('MainScene')
+        this.anims.create({
+            key: 'player-anim',
+            frames: this.anims.generateFrameNumbers('player', {
+                start: 1,
+                end: 1
+            }),
+            frameRate: 1,
+            repeat: -1
+        })
+
+        this.scene.start('LevelScene')
 
         /**
          * This is how you would dynamically import the mainScene class (with code splitting),
