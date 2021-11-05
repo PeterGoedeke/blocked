@@ -10,19 +10,19 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, '../dist'),
         filename: '[name].bundle.js',
-        chunkFilename: '[name].chunk.js',
+        chunkFilename: '[name].chunk.js'
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js'],
+        extensions: ['.ts', '.tsx', '.js']
     },
     module: {
         rules: [
             {
                 test: /\.tsx?$|\.jsx?$/,
                 include: path.join(__dirname, '../src'),
-                loader: 'ts-loader',
-            },
-        ],
+                loader: 'ts-loader'
+            }
+        ]
     },
     optimization: {
         splitChunks: {
@@ -31,10 +31,10 @@ module.exports = {
                     test: /[\\/]node_modules[\\/]/,
                     name: 'vendors',
                     chunks: 'all',
-                    filename: '[name].bundle.js',
-                },
-            },
-        },
+                    filename: '[name].bundle.js'
+                }
+            }
+        }
     },
     plugins: [
         new webpack.ProgressPlugin(),
@@ -43,12 +43,12 @@ module.exports = {
             patterns: [
                 { from: 'src/assets', to: 'assets' },
                 { from: 'pwa', to: '' },
-                { from: 'src/favicon.ico', to: '' },
-            ],
+                { from: 'src/favicon.ico', to: '' }
+            ]
         }),
         new InjectManifest({
             swSrc: path.resolve(__dirname, '../pwa/sw.js'),
-            swDest: 'sw.js',
-        }),
-    ],
+            swDest: 'sw.js'
+        })
+    ]
 }
