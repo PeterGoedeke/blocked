@@ -4,24 +4,16 @@ import { cellSize } from '../objects/GridManager'
 import Player from '../objects/Player'
 import '../objects/LevelManager'
 import BlockStrategy from '../objects/strategies/BlockStrategy'
-
-interface Level {
-    width: number
-    height: number
-    playerStart: {
-        x: number
-        y: number
-    }
-    blocks: {
-        x: number
-        y: number
-        type: string
-        linkCode: string
-    }[]
-}
+import { getLevel } from '../objects/LevelManager'
 
 interface Links {
     [key: string]: BlockStrategy[]
+}
+
+interface InitData {
+    series: string
+    index: number
+    level: Level
 }
 
 export default class LevelScene extends Phaser.Scene {
@@ -29,7 +21,11 @@ export default class LevelScene extends Phaser.Scene {
     blocks!: Phaser.Physics.Arcade.StaticGroup
     pickups!: Phaser.Physics.Arcade.Group
     entities!: Phaser.Physics.Arcade.Group
+
     level!: Level
+    series!: string
+    index!: number
+
     blockFactory: BlockFactory
     links: Links
 
@@ -40,8 +36,12 @@ export default class LevelScene extends Phaser.Scene {
         this.links = {}
     }
 
-    init(level: Level) {
-        this.level = level
+    async init(data: InitData) {
+        this.level = data.level
+        this.series = data.series
+        this.index = data.index
+
+        console.log(data)
     }
 
     addBlock(type: string, gridX: number, gridY: number) {
@@ -74,52 +74,23 @@ export default class LevelScene extends Phaser.Scene {
         })
 
         this.level.blocks.forEach(blockRaw => {
-            const block = this.addBlock(blockRaw.type, blockRaw.x, blockRaw.y)
-            if (!this.links[blockRaw.linkCode]) {
-                this.links[blockRaw.linkCode] = []
+            const block = this.addBlock(blockRaw.code, blockRaw.x, blockRaw.y)
+
+            if (blockRaw.linkCode !== undefined) {
+                if (!this.links[blockRaw.linkCode]) {
+                    this.links[blockRaw.linkCode] = []
+                }
+
+                this.links[blockRaw.linkCode].forEach(strategy => {
+                    strategy.link(block.strategy)
+                    block.strategy.link(strategy)
+                })
+
+                this.links[blockRaw.linkCode].push(block.strategy)
             }
-
-            this.links[blockRaw.linkCode].forEach(strategy => {
-                strategy.link(block.strategy)
-                block.strategy.link(strategy)
-            })
-
-            this.links[blockRaw.linkCode].push(block.strategy)
         })
 
         this.setPlayer(this.level.playerStart.x, this.level.playerStart.y)
-
-        // const a = factory.createBlockFromCode('b', this, cellSize * 1, cellSize * 1)
-        // const b = factory.createBlockFromCode('b', this, cellSize * 8, cellSize * 8)
-
-        // const c = factory.createBlockFromCode('i', this, cellSize * 10, cellSize * 8)
-        // const d = factory.createBlockFromCode('h', this, cellSize * 3, cellSize * 5)
-
-        // this.blocks.addMultiple([
-        //     factory.createBlockFromCode('e', this, 0, cellSize * 4),
-        //     factory.createBlockFromCode('a', this, cellSize * 1, cellSize * 5),
-        //     factory.createBlockFromCode('e', this, cellSize * 1, cellSize * 2),
-        //     factory.createBlockFromCode('e', this, cellSize * 5, cellSize * 3),
-        //     factory.createBlockFromCode('a', this, cellSize * 2, cellSize * 5),
-        //     factory.createBlockFromCode('a', this, cellSize * 2, cellSize * 4),
-        //     // factory.createBlockFromCode('g', this, cellSize * 3, cellSize * 5),
-        //     factory.createBlockFromCode('d', this, cellSize * 7, cellSize * 4),
-        //     factory.createBlockFromCode('a', this, cellSize * 4, cellSize * 5),
-        //     factory.createBlockFromCode('a', this, cellSize * 5, cellSize * 5),
-        //     factory.createBlockFromCode('a', this, cellSize * 6, cellSize * 1),
-        //     factory.createBlockFromCode('a', this, cellSize * 4, cellSize * 1),
-        //     factory.createBlockFromCode('a', this, cellSize * 0, cellSize * 0),
-        //     factory.createBlockFromCode('a', this, cellSize * 11, cellSize * 8),
-        //     a,
-        //     b,
-        //     d
-        // ])
-        // this.pickups.add(c)
-
-        // a.strategy.link(b.strategy)
-        // b.strategy.link(a.strategy)
-
-        // c.strategy.link(d.strategy)
 
         this.physics.add.collider(this.player, this.blocks, (p, b) => {
             const block = b as Block
@@ -160,7 +131,12 @@ export default class LevelScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                this.scene.launch('MenuOverlayScene', this.scene)
+                this.scene.launch('MenuOverlayScene', {
+                    wonLevel: false,
+                    levelScene: this.scene,
+                    series: this.series,
+                    index: this.index
+                })
                 this.scene.pause()
             }
         })

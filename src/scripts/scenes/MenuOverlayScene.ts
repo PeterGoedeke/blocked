@@ -1,12 +1,29 @@
+import { getNextLevel } from '../objects/LevelManager'
+
+interface InitData {
+    wonLevel: boolean
+    levelScene: Phaser.Scenes.ScenePlugin
+    series: string
+    index: number
+}
+
 export default class MenuOverlayScene extends Phaser.Scene {
     levelScene!: Phaser.Scenes.ScenePlugin
+    wonLevel!: boolean
+    series!: string
+    index!: number
 
     constructor() {
         super({ key: 'MenuOverlayScene' })
     }
 
-    init(levelScene: Phaser.Scenes.ScenePlugin) {
-        this.levelScene = levelScene
+    init(data: InitData) {
+        this.levelScene = data.levelScene
+        this.wonLevel = data.wonLevel
+        this.series = data.series
+        this.index = data.index
+
+        console.log(this.wonLevel)
     }
 
     create() {
@@ -26,10 +43,10 @@ export default class MenuOverlayScene extends Phaser.Scene {
             button.setBackgroundColor('darkgrey')
             button.setFontSize(48)
             button.setInteractive()
+        })
 
-            button.on('pointeroff', () => {
-                console.log(button.text)
-            })
+        nextLevelButton.on('pointerdown', () => {
+            this.onNextLevel()
         })
 
         restartLevelButton.on('pointerdown', () => {
@@ -47,14 +64,32 @@ export default class MenuOverlayScene extends Phaser.Scene {
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
             console.log(event.key)
             if (event.key === 'Escape') {
-                const scene = this.scene.resume('LevelScene')
-                scene.restart()
-                // levelScene.restart()
-                this.scene.stop()
-            } else if (event.key === 'r') {
+                if (!this.wonLevel) {
+                    this.scene.resume('LevelScene')
+                    this.scene.stop()
+                }
+            } else if (event.key === 'r' || event.key === 'ArrowDown') {
                 this.onRestart()
+            } else if (event.key === 'n' || event.key === 'ArrowUp') {
+                this.onNextLevel()
             }
         })
+    }
+
+    async onNextLevel() {
+        const level = await getNextLevel(this.series, this.index)
+
+        this.levelScene.stop()
+
+        if (level) {
+            this.scene.start('LevelScene', {
+                series: this.series,
+                index: this.index + 1,
+                level
+            })
+        } else {
+            this.scene.start('MainMenuScene')
+        }
     }
 
     onRestart() {

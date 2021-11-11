@@ -4,10 +4,10 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('phaser-logo', 'assets/img/phaser-logo.png')
         this.load.image('block', 'assets/img/block.png')
         this.load.image('player', 'assets/img/player.png')
         this.load.image('cloud', 'assets/img/cloud.png')
+        this.load.image('key', 'assets/img/key.png')
     }
 
     create() {
@@ -21,7 +21,9 @@ export default class PreloadScene extends Phaser.Scene {
             repeat: -1
         })
 
-        this.scene.start('LevelScene')
+        this.scene.start('MainMenuScene')
+        // this.scene.start('LevelEditorScene')
+        this.scene.start('CloudScene')
 
         /**
          * This is how you would dynamically import the mainScene class (with code splitting),
