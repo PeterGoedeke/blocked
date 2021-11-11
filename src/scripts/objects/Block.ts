@@ -1,12 +1,13 @@
 import BlockStrategy from './strategies/BlockStrategy'
 import { cellSize, phaserCoordinatesToGrid } from './GridManager'
 import Player from './Player'
+import LevelScene from '../scenes/LevelScene'
 
 export default class Block extends Phaser.Physics.Arcade.Image {
     strategy!: BlockStrategy
-    scene: Phaser.Scene
+    scene: LevelScene
 
-    constructor(scene: Phaser.Scene, x: number, y: number, tint: number) {
+    constructor(scene: LevelScene, x: number, y: number, tint: number) {
         super(scene, x, y, 'block')
 
         this.scene = scene
@@ -19,6 +20,7 @@ export default class Block extends Phaser.Physics.Arcade.Image {
 
     setStrategy(strategy: BlockStrategy) {
         this.strategy = strategy
+        this.setTexture(strategy.texture)
     }
 
     collide(player: Player) {

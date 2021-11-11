@@ -25,13 +25,17 @@ export default class Cloud extends Phaser.Physics.Arcade.Sprite {
     }
 
     restart() {
-        console.log('yeet')
         this.setVelocityX(this.randomIntFromInterval(30, 300))
 
         const unit = this.randomIntFromInterval(20, 60)
 
         this.setDisplaySize((unit * 5) / 2, unit)
-        this.setY(this.randomIntFromInterval(unit * 10, this.scene.cameras.main.height - unit * 10))
+        this.setY(
+            this.randomIntFromInterval(
+                unit / 2 + 10,
+                this.scene.cameras.main.height - unit / 2 - 10
+            )
+        )
         this.setX(this.randomIntFromInterval(-this.scene.cameras.main.width, -unit * 50))
         this.setAlpha(this.randomIntFromInterval(1, 8) / 10)
     }

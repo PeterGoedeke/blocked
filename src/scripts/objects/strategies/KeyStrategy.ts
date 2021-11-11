@@ -1,9 +1,14 @@
 import BlockStrategy from './BlockStrategy'
 import Player from '../Player'
 import DoorStrategy from './DoorStrategy'
+import Block from '../Block'
 
 export default class KeyStrategy extends BlockStrategy {
     door?: DoorStrategy
+
+    constructor(block: Block) {
+        super(block, 'key')
+    }
 
     handle(player: Player) {
         if (!this.door) {

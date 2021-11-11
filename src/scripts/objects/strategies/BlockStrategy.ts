@@ -3,9 +3,11 @@ import Player from '../Player'
 
 export default abstract class BlockStrategy {
     protected block: Block
+    texture: string
 
-    constructor(block: Block) {
+    constructor(block: Block, texture = 'block') {
         this.block = block
+        this.texture = texture
     }
 
     abstract handle(player: Player): void
