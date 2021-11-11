@@ -4,10 +4,12 @@ import Player from './Player'
 
 export default class Block extends Phaser.Physics.Arcade.Image {
     strategy!: BlockStrategy
+    scene: Phaser.Scene
 
     constructor(scene: Phaser.Scene, x: number, y: number, tint: number) {
         super(scene, x, y, 'block')
 
+        this.scene = scene
         scene.add.existing(this)
 
         this.setOrigin(0, 0)

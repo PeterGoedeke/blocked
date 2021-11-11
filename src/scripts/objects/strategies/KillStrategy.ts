@@ -4,6 +4,6 @@ import Player from '../Player'
 
 export default class KillStrategy extends BlockStrategy {
     handle(player: Player) {
-        player.sendToStart()
+        this.block.scene.scene.restart()
     }
 }
