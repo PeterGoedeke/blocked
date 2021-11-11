@@ -1,14 +1,18 @@
 import 'phaser'
 import CloudScene from './scenes/CloudScene'
+import LevelEditorScene from './scenes/LevelEditor'
 import LevelScene from './scenes/LevelScene'
+import LevelSelectScene from './scenes/LevelSelect'
+import MainMenuScene from './scenes/MainMenu'
+import MenuOverlayScene from './scenes/MenuOverlayScene'
 import PreloadScene from './scenes/preloadScene'
 
-const DEFAULT_WIDTH = 1280
+const DEFAULT_WIDTH = 1260
 const DEFAULT_HEIGHT = 720
 
 const config = {
     type: Phaser.AUTO,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#bdfbff',
     scale: {
         parent: 'phaser-game',
         mode: Phaser.Scale.FIT,
@@ -16,7 +20,15 @@ const config = {
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT
     },
+    scene: [
+        PreloadScene,
+        LevelScene,
+        MenuOverlayScene,
         CloudScene,
+        MainMenuScene,
+        LevelSelectScene,
+        LevelEditorScene
+    ],
     physics: {
         default: 'arcade',
         arcade: {

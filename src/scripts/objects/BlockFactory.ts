@@ -1,3 +1,4 @@
+import LevelScene from '../scenes/LevelScene'
 import Block from './Block'
 import BlockStrategy from './strategies/BlockStrategy'
 import BouncerStrategy from './strategies/BouncerStrategy'
@@ -9,13 +10,14 @@ import NullStrategy from './strategies/NullStrategy'
 import PlatformStrategy from './strategies/PlatformStrategy'
 import SwapperStrategy from './strategies/SwapperStrategy'
 import TeleporterStrategy from './strategies/TeleporterStrategy'
+import WinStrategy from './strategies/WinStrategy'
 
 interface BlockSet {
-    [key: string]: (scene: Phaser.Scene, x: number, y: number) => Block
+    [key: string]: (scene: LevelScene, x: number, y: number) => Block
 }
 
 function createBlock(
-    scene: Phaser.Scene,
+    scene: LevelScene,
     x: number,
     y: number,
     tint: number,
@@ -37,10 +39,10 @@ export default class BlockFactory {
                 return createBlock(scene, x, y, 0x808080, NullStrategy)
             },
             b: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x37fa6b, TeleporterStrategy)
+                return createBlock(scene, x, y, 0x52d4ff, TeleporterStrategy)
             },
             c: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x004d46, SwapperStrategy)
+                return createBlock(scene, x, y, 0x0028c9, SwapperStrategy)
             },
             d: (scene, x, y) => {
                 return createBlock(scene, x, y, 0xffbb1c, FourSwapperStrategy)
@@ -52,13 +54,16 @@ export default class BlockFactory {
                 return createBlock(scene, x, y, 0xff82fd, PlatformStrategy)
             },
             g: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x91008f, KillStrategy)
+                return createBlock(scene, x, y, 0x821800, KillStrategy)
             },
             h: (scene, x, y) => {
                 return createBlock(scene, x, y, 0x734172, DoorStrategy)
             },
             i: (scene, x, y) => {
                 return createBlock(scene, x, y, 0xc5eb94, KeyStrategy)
+            },
+            j: (scene, x, y) => {
+                return createBlock(scene, x, y, 0x37fa6b, WinStrategy)
             }
         }
     }
@@ -70,12 +75,7 @@ export default class BlockFactory {
         return this.instance
     }
 
-    public createBlockFromCode(
-        blockCode: string,
-        scene: Phaser.Scene,
-        x: number,
-        y: number
-    ): Block {
+    public createBlockFromCode(blockCode: string, scene: LevelScene, x: number, y: number): Block {
         return this.blockSet[blockCode](scene, x, y)
     }
 }
@@ -94,4 +94,25 @@ export enum BlockCodes {
     KILL = 'g',
     DOOR = 'h',
     KEY = 'i'
+}
+
+interface Dict {
+    [key: string]: number
+}
+
+const blockTints: Dict = {
+    a: 0x808080,
+    b: 0x52d4ff,
+    c: 0x0028c9,
+    d: 0xffbb1c,
+    e: 0xfdff6b,
+    f: 0xff82fd,
+    g: 0x821800,
+    h: 0x734172,
+    i: 0xc5eb94,
+    j: 0x37fa6b
+}
+
+export const getBlockTintFromCode = (code: string) => {
+    return blockTints[code]
 }
