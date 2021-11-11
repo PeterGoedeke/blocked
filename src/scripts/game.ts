@@ -1,5 +1,5 @@
 import 'phaser'
-import MainScene from './scenes/mainScene'
+import CloudScene from './scenes/CloudScene'
 import LevelScene from './scenes/LevelScene'
 import PreloadScene from './scenes/preloadScene'
 
@@ -16,7 +16,7 @@ const config = {
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT
     },
-    scene: [PreloadScene, LevelScene],
+        CloudScene,
     physics: {
         default: 'arcade',
         arcade: {

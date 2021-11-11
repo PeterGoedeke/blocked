@@ -79,3 +79,19 @@ export default class BlockFactory {
         return this.blockSet[blockCode](scene, x, y)
     }
 }
+
+export const isPickup = (code: string) => {
+    return code === 'i'
+}
+
+export enum BlockCodes {
+    STONE = 'a',
+    TELEPORTER = 'b',
+    SWAPPER = 'c',
+    FOUR_SWAPPER = 'd',
+    BOUNCER = 'e',
+    PLATFORM = 'f',
+    KILL = 'g',
+    DOOR = 'h',
+    KEY = 'i'
+}
