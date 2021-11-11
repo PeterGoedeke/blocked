@@ -4,13 +4,15 @@ import Player from '../Player'
 export default class PlatformStrategy extends BlockStrategy {
     handle(player: Player) {
         setTimeout(() => {
-            this.block.body.destroy()
+            this.block.destroy()
+            // this.block.body.destroy()
             this.block.setVisible(false)
         }, 300)
 
+        const coords = this.gridCoordinates
         const timeout = setTimeout(() => {
             if (player.resting) {
-                const d = this.gridCoordinates.subtract(player.gridCoordinates)
+                const d = coords.subtract(player.gridCoordinates)
                 player.setGridDirection(d)
             }
         }, 300)
