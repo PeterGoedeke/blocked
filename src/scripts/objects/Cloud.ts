@@ -25,7 +25,9 @@ export default class Cloud extends Phaser.Physics.Arcade.Sprite {
     }
 
     restart() {
-        const unit = this.randomIntFromInterval(1, 2)
+        let unit = this.randomIntFromInterval(0, 2)
+
+        if (unit === 0) unit = 1
 
         this.setVelocityX(-unit * 10)
 

@@ -17,6 +17,10 @@ export default class CloudScene extends Phaser.Scene {
 
         this.clouds.addMultiple(clouds)
         clouds.forEach(cloud => cloud.start())
+
+        for (let i = 10; i < clouds.length; i++) {
+            clouds[i].setX(clouds[i].x + this.cameras.main.width)
+        }
     }
 
     update() {
