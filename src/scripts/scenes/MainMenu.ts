@@ -1,3 +1,6 @@
+import { getAllLevels } from '../objects/LevelManager'
+import MenuItem from '../objects/widgets/MenuItem'
+
 export default class MainMenuScene extends Phaser.Scene {
     levelScene!: Phaser.Scenes.ScenePlugin
 
@@ -5,23 +8,21 @@ export default class MainMenuScene extends Phaser.Scene {
         super({ key: 'MainMenuScene' })
     }
 
-    create() {
+    async create() {
         const centreX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         const quarterY = this.cameras.main.worldView.y + this.cameras.main.height / 4
 
-        const levelSelectButton = this.add.text(centreX, quarterY, 'Level select')
-        const settingsButton = this.add.text(centreX, quarterY + quarterY / 2, 'Settings')
-        const levelEditorButton = this.add.text(centreX, quarterY * 2, 'Level Editor')
+        const title = new MenuItem(this, centreX, quarterY * 1, 'BLOCKED')
+        title.setFontSize(128)
 
-        const buttons = [levelSelectButton, settingsButton, levelEditorButton]
+        const levelSelectButton = new MenuItem(this, centreX, quarterY * 2, 'Level Select', true)
+        const settingsButton = new MenuItem(this, centreX, quarterY * 2.5, 'Settings', true)
+        const levelEditorButton = new MenuItem(this, centreX, quarterY * 3, 'Level Editor', true)
 
-        buttons.forEach(button => {
-            button.setOrigin(0.5)
-            button.setAlpha(0.9)
-            button.setBackgroundColor('darkgrey')
-            button.setFontSize(48)
-            button.setInteractive()
-        })
+        this.children.add(title)
+        this.children.add(levelSelectButton)
+        this.children.add(settingsButton)
+        this.children.add(levelEditorButton)
 
         levelSelectButton.on('pointerdown', () => {
             this.onLevelSelect()
@@ -37,16 +38,19 @@ export default class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
             console.log(event.key)
-            if (event.key === 'g') {
+            if (event.key === 'g' || event.key === 'ArrowLeft') {
                 this.onLevelSelect()
-            } else if (event.key === 's') {
+            } else if (event.key === 's' || event.key === 'ArrowUp') {
                 this.onSettings()
+            } else if (event.key === 'ArrowRight') {
+                this.onLevelEditor()
             }
         })
     }
 
-    onLevelSelect() {
-        this.scene.start('LevelSelectScene')
+    async onLevelSelect() {
+        const levels = await getAllLevels('stock')
+        this.scene.start('LevelSelectScene', levels)
     }
 
     onSettings() {
