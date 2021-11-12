@@ -23,6 +23,7 @@ export default class PreloadScene extends Phaser.Scene {
         })
 
         this.scene.start('MainMenuScene')
+        // this.scene.start('LevelSelectScene')
         // this.scene.start('LevelEditorScene')
         this.scene.start('CloudScene')
         this.scene.start('BackgroundScene')

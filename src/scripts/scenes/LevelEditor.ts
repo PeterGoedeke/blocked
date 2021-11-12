@@ -1,22 +1,26 @@
-import { getBlockTintFromCode } from '../objects/BlockFactory'
-import {
-    cellSize,
-    gridCoordinatesToPhaser,
-    phaserCoordinatesToGridFloor
-} from '../objects/GridManager'
+import { getBlockList } from '../objects/BlockFactory'
+import { gridCoordinatesToPhaser, phaserCoordinatesToLevelEditor } from '../objects/GridManager'
+import MenuItem from '../objects/widgets/MenuItem'
 
 export default class LevelEditorScene extends Phaser.Scene {
-    activeBlockCode: string
+    activeBlockData: {
+        code: string
+        texture?: string
+        tint: number
+    }
+
     activeBlockImage!: Phaser.GameObjects.Image
-    blocks!: Phaser.Physics.Arcade.StaticGroup
+    blocks: Phaser.GameObjects.Image[]
     level: Level
     linking: boolean
     lines: Phaser.GameObjects.Line[]
+    cellSize: number
+    toolbarCellSize: number
 
     constructor() {
         super({ key: 'LevelEditorScene' })
 
-        this.activeBlockCode = 'a'
+        this.activeBlockData = getBlockList()[0]
         this.linking = false
 
         this.level = {
@@ -29,17 +33,20 @@ export default class LevelEditorScene extends Phaser.Scene {
             blocks: []
         }
 
+        this.blocks = []
         this.lines = []
+        this.cellSize = 56
+        this.toolbarCellSize = this.cellSize / 1.5
     }
 
     create() {
-        const rectangle = this.add.grid(
-            this.cameras.main.width / 2,
-            this.cameras.main.height / 2,
-            this.cameras.main.width,
-            this.cameras.main.height,
-            cellSize,
-            cellSize,
+        const backgroundGrid = this.add.grid(
+            0,
+            0,
+            this.cellSize * this.level.width,
+            this.cellSize * this.level.height,
+            this.cellSize,
+            this.cellSize,
             undefined,
             undefined,
             0xffffff,
@@ -47,51 +54,67 @@ export default class LevelEditorScene extends Phaser.Scene {
             // undefined,
             // 0
         )
-        rectangle.setInteractive()
+        backgroundGrid.setOrigin(0, 0)
+        backgroundGrid.setInteractive()
 
-        const blocks = [
-            { code: 'a', tint: 0x808080 },
-            { code: 'b', tint: 0x52d4ff },
-            { code: 'c', tint: 0x0028c9 },
-            { code: 'd', tint: 0xffbb1c },
-            { code: 'e', tint: 0xfdff6b },
-            { code: 'f', tint: 0xff82fd },
-            { code: 'g', tint: 0x821800 },
-            { code: 'h', tint: 0x734172 },
-            { code: 'i', tint: 0xc5eb94 },
-            { code: 'j', tint: 0x37fa6b }
-        ]
+        const backButton = new MenuItem(this, this.cameras.main.width - 40, 40, '<', true)
+        this.children.add(backButton)
+
+        const clearButton = new MenuItem(
+            this,
+            this.cameras.main.width - 40,
+            this.cameras.main.height - 80,
+            '🚫',
+            true
+        )
+        clearButton.setFontSize(40)
+        this.children.add(clearButton)
+
+        backButton.on('pointerdown', () => {
+            this.onMainMenu()
+        })
+
+        clearButton.on('pointerdown', () => {
+            this.level.blocks = []
+            this.blocks.forEach(block => block.destroy())
+            this.blocks = []
+            this.refreshLines()
+        })
 
         const player = this.add.image(
-            cellSize * this.level.playerStart.x,
-            cellSize * this.level.playerStart.y,
+            this.cellSize * this.level.playerStart.x,
+            this.cellSize * this.level.playerStart.y,
             'player'
         )
         player.setOrigin(0, 0)
-        player.setDisplaySize(cellSize, cellSize)
+        player.setDisplaySize(this.cellSize, this.cellSize)
 
-        blocks.forEach((block, i) => {
+        getBlockList().forEach((block, i) => {
             const image = this.add.image(
-                this.cameras.main.width - cellSize / 2,
-                cellSize / 4 + 10 + (cellSize / 2) * 1.1 * i,
-                'block'
+                this.cameras.main.width - this.toolbarCellSize,
+                this.cellSize / 4 + 80 + this.toolbarCellSize * 1.1 * i,
+                block.texture || 'block'
             )
-            image.setDisplaySize(cellSize / 2, cellSize / 2)
+            image.setDisplaySize(this.toolbarCellSize, this.toolbarCellSize)
             image.setTint(block.tint)
             image.setInteractive()
+
             image.on('pointerdown', () => {
-                this.activeBlockCode = block.code
+                this.activeBlockData = block
                 this.activeBlockImage.setTint(block.tint)
-                console.log(block.code)
+                if (block.texture) {
+                    this.activeBlockImage.setTexture(block.texture)
+                }
             })
         })
 
         this.activeBlockImage = this.add.image(
-            this.cameras.main.width - cellSize / 2,
-            this.cameras.main.height - cellSize / 4 - 10,
+            this.cameras.main.width - this.toolbarCellSize,
+            this.cameras.main.height - this.cellSize / 4 - 10,
             'block'
         )
-        this.activeBlockImage.setDisplaySize(cellSize / 2, cellSize / 2)
+
+        this.activeBlockImage.setDisplaySize(this.toolbarCellSize, this.toolbarCellSize)
         this.activeBlockImage.setTint(0x808080)
         this.activeBlockImage.setInteractive()
 
@@ -100,27 +123,30 @@ export default class LevelEditorScene extends Phaser.Scene {
             this.activeBlockImage.setAlpha(this.linking ? 0.2 : 1)
         })
 
-        this.blocks = this.physics.add.staticGroup()
-
-        rectangle.on('pointerdown', (event: any) => {
+        backgroundGrid.on('pointerdown', (event: any) => {
             const x: number = event.downX
             const y: number = event.downY
 
             const click = new Phaser.Math.Vector2(x, y)
-            const gridLocation = phaserCoordinatesToGridFloor(click)
-            const location = gridCoordinatesToPhaser(gridLocation)
+            const gridLocation = phaserCoordinatesToLevelEditor(click, this.cellSize)
+            const location = gridCoordinatesToPhaser(gridLocation, this.cellSize)
 
-            const block = this.add.image(location.x, location.y, 'block')
+            const block = this.add.image(
+                location.x,
+                location.y,
+                this.activeBlockData.texture || 'block'
+            )
             block.setOrigin(0, 0)
-            block.setTint(getBlockTintFromCode(this.activeBlockCode))
-            block.setDisplaySize(cellSize, cellSize)
+            block.setTint(this.activeBlockData.tint)
+            block.setDisplaySize(this.cellSize, this.cellSize)
             block.setInteractive()
 
             this.level.blocks.push({
                 x: gridLocation.x,
                 y: gridLocation.y,
-                code: this.activeBlockCode
+                code: this.activeBlockData.code
             })
+            this.blocks.push(block)
 
             block.on('pointerdown', () => {
                 if (this.linking) {
@@ -147,13 +173,13 @@ export default class LevelEditorScene extends Phaser.Scene {
 
             console.log(this.level)
             console.log(JSON.stringify(this.level))
-            // const block = BlockFactory.getInstance().createBlockFromCode(
-            //     this.activeBlockCode,
-            //     this,
-            //     gridLocation.x,
-            //     gridLocation.y
-            // )
-            // this.blocks.add(block)
+        })
+
+        this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
+            console.log(event.key)
+            if (event.key === 'Escape') {
+                this.onMainMenu()
+            }
         })
     }
 
@@ -180,10 +206,10 @@ export default class LevelEditorScene extends Phaser.Scene {
                         const line = this.add.line(
                             0,
                             0,
-                            block.x * cellSize + cellSize / 2,
-                            block.y * cellSize + cellSize / 2,
-                            linkBlock.x * cellSize + cellSize / 2,
-                            linkBlock.y * cellSize + cellSize / 2,
+                            block.x * this.cellSize + this.cellSize / 2,
+                            block.y * this.cellSize + this.cellSize / 2,
+                            linkBlock.x * this.cellSize + this.cellSize / 2,
+                            linkBlock.y * this.cellSize + this.cellSize / 2,
                             0xffbdce,
                             1
                         )
@@ -193,5 +219,9 @@ export default class LevelEditorScene extends Phaser.Scene {
                 }
             }
         }
+    }
+
+    onMainMenu() {
+        this.scene.start('MainMenuScene')
     }
 }
