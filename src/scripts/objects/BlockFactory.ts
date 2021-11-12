@@ -21,52 +21,78 @@ function createBlock(
     x: number,
     y: number,
     tint: number,
-    strategyClass: new (block: Block) => BlockStrategy
+    strategyClass: new (block: Block, texture?: string) => BlockStrategy,
+    texture = 'block'
 ) {
     const block = new Block(scene, x, y, tint)
-    const strategy = new strategyClass(block)
+    const strategy = new strategyClass(block, texture)
     block.setStrategy(strategy)
     return block
 }
 
+interface BlockData {
+    [key: string]: {
+        tint: number
+        strategy: new (block: Block, texture?: string) => BlockStrategy
+        texture?: string
+    }
+}
+
+const blockData: BlockData = {
+    a: {
+        tint: 0x808080,
+        strategy: NullStrategy
+    },
+    b: {
+        tint: 0x52d4ff,
+        strategy: TeleporterStrategy
+    },
+    c: {
+        tint: 0x0028c9,
+        strategy: SwapperStrategy
+    },
+    d: {
+        tint: 0xffbb1c,
+        strategy: FourSwapperStrategy
+    },
+    e: {
+        tint: 0xfdff6b,
+        strategy: BouncerStrategy
+    },
+    f: {
+        tint: 0xff82fd,
+        strategy: PlatformStrategy
+    },
+    g: {
+        tint: 0x821800,
+        strategy: KillStrategy
+    },
+    h: {
+        tint: 0x734172,
+        strategy: DoorStrategy
+    },
+    i: {
+        tint: 0xc5eb94,
+        strategy: KeyStrategy,
+        texture: 'key'
+    },
+    j: {
+        tint: 0x37fa6b,
+        strategy: WinStrategy
+    }
+}
+
+export const getBlockList = () => {
+    const keys = Object.keys(blockData)
+    return keys.map(key => ({ code: key, ...blockData[key] }))
+}
+
+export const getBlockData = (code: string) => {
+    return blockData[code]
+}
+
 export default class BlockFactory {
     private static instance: BlockFactory
-    private blockSet: BlockSet
-
-    private constructor() {
-        this.blockSet = {
-            a: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x808080, NullStrategy)
-            },
-            b: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x52d4ff, TeleporterStrategy)
-            },
-            c: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x0028c9, SwapperStrategy)
-            },
-            d: (scene, x, y) => {
-                return createBlock(scene, x, y, 0xffbb1c, FourSwapperStrategy)
-            },
-            e: (scene, x, y) => {
-                return createBlock(scene, x, y, 0xfdff6b, BouncerStrategy)
-            },
-            f: (scene, x, y) => {
-                return createBlock(scene, x, y, 0xff82fd, PlatformStrategy)
-            },
-            g: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x821800, KillStrategy)
-            },
-            h: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x734172, DoorStrategy)
-            },
-            i: (scene, x, y) => {
-                return createBlock(scene, x, y, 0xc5eb94, KeyStrategy)
-            },
-            j: (scene, x, y) => {
-                return createBlock(scene, x, y, 0x37fa6b, WinStrategy)
-            }
-        }
-    }
 
     public static getInstance() {
         if (!this.instance) {
@@ -76,43 +102,11 @@ export default class BlockFactory {
     }
 
     public createBlockFromCode(blockCode: string, scene: LevelScene, x: number, y: number): Block {
-        return this.blockSet[blockCode](scene, x, y)
+        const data = blockData[blockCode]
+        return createBlock(scene, x, y, data.tint, data.strategy, data.texture)
     }
 }
 
 export const isPickup = (code: string) => {
     return code === 'i'
-}
-
-export enum BlockCodes {
-    STONE = 'a',
-    TELEPORTER = 'b',
-    SWAPPER = 'c',
-    FOUR_SWAPPER = 'd',
-    BOUNCER = 'e',
-    PLATFORM = 'f',
-    KILL = 'g',
-    DOOR = 'h',
-    KEY = 'i'
-}
-
-interface Dict {
-    [key: string]: number
-}
-
-const blockTints: Dict = {
-    a: 0x808080,
-    b: 0x52d4ff,
-    c: 0x0028c9,
-    d: 0xffbb1c,
-    e: 0xfdff6b,
-    f: 0xff82fd,
-    g: 0x821800,
-    h: 0x734172,
-    i: 0xc5eb94,
-    j: 0x37fa6b
-}
-
-export const getBlockTintFromCode = (code: string) => {
-    return blockTints[code]
 }

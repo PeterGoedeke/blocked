@@ -26,7 +26,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     setGridPosition(vec: Phaser.Math.Vector2) {
-        console.log('call')
         this.setVelocity(0, 0)
         const v = gridCoordinatesToPhaser(vec)
         // console.log(vec)

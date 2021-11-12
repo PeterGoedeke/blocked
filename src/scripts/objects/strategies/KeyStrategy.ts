@@ -6,10 +6,6 @@ import Block from '../Block'
 export default class KeyStrategy extends BlockStrategy {
     door?: DoorStrategy
 
-    constructor(block: Block) {
-        super(block, 'key')
-    }
-
     handle(player: Player) {
         if (!this.door) {
             throw Error(`Key at ${this.block.gridCoordinates} is not linked`)
