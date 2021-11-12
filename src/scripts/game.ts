@@ -5,7 +5,7 @@ import LevelEditorScene from './scenes/LevelEditor'
 import LevelScene from './scenes/LevelScene'
 import LevelSelectScene from './scenes/LevelSelect'
 import MainMenuScene from './scenes/MainMenu'
-import MenuOverlayScene from './scenes/MenuOverlayScene'
+import MenuOverlayScene from './scenes/MenuOverlay'
 import PreloadScene from './scenes/preloadScene'
 
 const DEFAULT_WIDTH = 1260

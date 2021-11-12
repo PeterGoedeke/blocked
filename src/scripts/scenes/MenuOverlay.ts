@@ -1,4 +1,5 @@
 import { getNextLevel } from '../objects/LevelManager'
+import MenuItem from '../objects/widgets/MenuItem'
 
 interface InitData {
     wonLevel: boolean
@@ -30,20 +31,21 @@ export default class MenuOverlayScene extends Phaser.Scene {
         const centreX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         const quarterY = this.cameras.main.worldView.y + this.cameras.main.height / 4
 
-        const nextLevelButton = this.add.text(centreX, quarterY, 'Next level')
-        const restartLevelButton = this.add.text(centreX, quarterY + quarterY / 2, 'Restart level')
-        const levelSelectButton = this.add.text(centreX, quarterY * 2, 'Level select')
-        const mainMenuButton = this.add.text(centreX, quarterY * 2 + quarterY / 2, 'Main menu')
+        const nextLevelButton = new MenuItem(this, centreX, quarterY, 'Next Level', true)
+        const restartLevelButton = new MenuItem(
+            this,
+            centreX,
+            quarterY * 1.5,
+            'Restart Level',
+            true
+        )
+        const levelSelectButton = new MenuItem(this, centreX, quarterY * 2, 'Level Select', true)
+        const mainMenuButton = new MenuItem(this, centreX, quarterY * 2.5, 'Main Menu', true)
 
-        const buttons = [nextLevelButton, restartLevelButton, levelSelectButton, mainMenuButton]
-
-        buttons.forEach(button => {
-            button.setOrigin(0.5)
-            button.setAlpha(0.9)
-            button.setBackgroundColor('darkgrey')
-            button.setFontSize(48)
-            button.setInteractive()
-        })
+        this.children.add(nextLevelButton)
+        this.children.add(restartLevelButton)
+        this.children.add(levelSelectButton)
+        this.children.add(mainMenuButton)
 
         nextLevelButton.on('pointerdown', () => {
             this.onNextLevel()
@@ -68,10 +70,14 @@ export default class MenuOverlayScene extends Phaser.Scene {
                     this.scene.resume('LevelScene')
                     this.scene.stop()
                 }
-            } else if (event.key === 'r' || event.key === 'ArrowDown') {
+            } else if (event.key === 'r' || event.key === 'ArrowUp') {
                 this.onRestart()
-            } else if (event.key === 'n' || event.key === 'ArrowUp') {
+            } else if (event.key === 'n' || event.key === 'ArrowLeft') {
                 this.onNextLevel()
+            } else if (event.key === 'ArrowRight' || event.key === 's') {
+                this.onLevelSelect()
+            } else if (event.key === 'ArrowDown' || event.key === 'm') {
+                this.onMainMenu()
             }
         })
     }
