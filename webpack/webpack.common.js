@@ -38,7 +38,7 @@ module.exports = {
     },
     plugins: [
         new webpack.ProgressPlugin(),
-        new HtmlWebpackPlugin({ gameName: 'My Phaser Game', template: 'src/index.html' }),
+        new HtmlWebpackPlugin({ gameName: 'Blocked', template: 'src/index.html' }),
         new CopyWebpackPlugin({
             patterns: [
                 { from: 'src/assets', to: 'assets' },

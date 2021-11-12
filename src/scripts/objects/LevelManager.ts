@@ -362,3 +362,11 @@ export const getLevel = async (series: string, index: number) => {
         throw Error(`Invalid series: ${series}`)
     }
 }
+
+export const getAllLevels = async (series: string) => {
+    if (series === 'stock') {
+        return stockLevels
+    } else {
+        throw Error(`Invalid series: ${series}`)
+    }
+}
