@@ -11,15 +11,9 @@ export default class CloudScene extends Phaser.Scene {
         this.scene.sendToBack()
         this.clouds = this.physics.add.group()
 
-        const clouds = [
-            new Cloud(this),
-            new Cloud(this),
-            new Cloud(this),
-            new Cloud(this),
-            new Cloud(this),
-            new Cloud(this),
-            new Cloud(this)
-        ]
+        const clouds = Array(20)
+            .fill(0)
+            .map(_ => new Cloud(this))
 
         this.clouds.addMultiple(clouds)
         clouds.forEach(cloud => cloud.start())
