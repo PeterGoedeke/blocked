@@ -12,3 +12,9 @@ interface Level {
         linkCode?: number
     }[]
 }
+
+interface GameLevel {
+    level: Level
+    series: string
+    index: number
+}

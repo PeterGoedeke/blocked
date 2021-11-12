@@ -4,16 +4,9 @@ import { cellSize } from '../objects/GridManager'
 import Player from '../objects/Player'
 import '../objects/LevelManager'
 import BlockStrategy from '../objects/strategies/BlockStrategy'
-import { getLevel } from '../objects/LevelManager'
 
 interface Links {
     [key: string]: BlockStrategy[]
-}
-
-interface InitData {
-    series: string
-    index: number
-    level: Level
 }
 
 export default class LevelScene extends Phaser.Scene {
@@ -36,12 +29,10 @@ export default class LevelScene extends Phaser.Scene {
         this.links = {}
     }
 
-    async init(data: InitData) {
+    async init(data: GameLevel) {
         this.level = data.level
         this.series = data.series
         this.index = data.index
-
-        console.log(data)
     }
 
     addBlock(type: string, gridX: number, gridY: number) {
