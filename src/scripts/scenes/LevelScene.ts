@@ -10,6 +10,7 @@ interface Links {
 }
 
 export default class LevelScene extends Phaser.Scene {
+    active: boolean
     player!: Player
     blocks!: Phaser.Physics.Arcade.StaticGroup
     pickups!: Phaser.Physics.Arcade.Group
@@ -27,20 +28,23 @@ export default class LevelScene extends Phaser.Scene {
 
         this.blockFactory = BlockFactory.getInstance()
         this.links = {}
+
+        this.active = true
     }
 
     async init(data: GameLevel) {
         this.level = data.level
         this.series = data.series
         this.index = data.index
+        this.active = true
     }
 
     addBlock(type: string, gridX: number, gridY: number) {
         const block = this.blockFactory.createBlockFromCode(
             type,
             this,
-            cellSize * gridX,
-            cellSize * gridY
+            cellSize * gridX + cellSize / 2,
+            cellSize * gridY + cellSize / 2
         )
 
         if (isPickup(type)) {
@@ -100,22 +104,22 @@ export default class LevelScene extends Phaser.Scene {
         const cursors = this.input.keyboard.createCursorKeys()
 
         cursors.left.addListener('down', () => {
-            if (this.player.resting) {
+            if (this.player.resting && this.active) {
                 this.player.setGridDirection(new Phaser.Math.Vector2(-1, 0))
             }
         })
         cursors.right.addListener('down', () => {
-            if (this.player.resting) {
+            if (this.player.resting && this.active) {
                 this.player.setGridDirection(new Phaser.Math.Vector2(1, 0))
             }
         })
         cursors.up.addListener('down', () => {
-            if (this.player.resting) {
+            if (this.player.resting && this.active) {
                 this.player.setGridDirection(new Phaser.Math.Vector2(0, -1))
             }
         })
         cursors.down.addListener('down', () => {
-            if (this.player.resting) {
+            if (this.player.resting && this.active) {
                 this.player.setGridDirection(new Phaser.Math.Vector2(0, 1))
             }
         })
@@ -143,5 +147,9 @@ export default class LevelScene extends Phaser.Scene {
         ) {
             this.scene.restart()
         }
+    }
+
+    resume() {
+        this.active = true
     }
 }
