@@ -56,6 +56,34 @@ export default class LevelScene extends Phaser.Scene {
         return block
     }
 
+    checkFallOutOfWorld() {
+        let falling = true
+        const playerPosition = new Phaser.Math.Vector2(
+            Math.round(this.player.x - cellSize / 2),
+            Math.round(this.player.y - cellSize / 2)
+        )
+        this.blocks.children.iterate(block => {
+            const v = new Phaser.Math.Vector2(
+                block.body.position.x - playerPosition.x,
+                block.body.position.y - playerPosition.y
+            ).normalize()
+            if (this.player.body.velocity.clone().normalize().fuzzyEquals(v)) {
+                falling = false
+            }
+        })
+        if (falling) {
+            this.tweens.add({
+                targets: this.player,
+                alpha: 0,
+                duration: 400,
+                ease: 'Power2',
+                onComplete: () => {
+                    this.scene.restart()
+                }
+            })
+        }
+    }
+
     setPlayer(gridX: number, gridY: number) {
         this.player = new Player(
             this,
@@ -110,21 +138,25 @@ export default class LevelScene extends Phaser.Scene {
         cursors.left.addListener('down', () => {
             if (this.player.resting && this.active) {
                 this.player.setGridDirection(new Phaser.Math.Vector2(-1, 0))
+                this.checkFallOutOfWorld()
             }
         })
         cursors.right.addListener('down', () => {
             if (this.player.resting && this.active) {
                 this.player.setGridDirection(new Phaser.Math.Vector2(1, 0))
+                this.checkFallOutOfWorld()
             }
         })
         cursors.up.addListener('down', () => {
             if (this.player.resting && this.active) {
                 this.player.setGridDirection(new Phaser.Math.Vector2(0, -1))
+                this.checkFallOutOfWorld()
             }
         })
         cursors.down.addListener('down', () => {
             if (this.player.resting && this.active) {
                 this.player.setGridDirection(new Phaser.Math.Vector2(0, 1))
+                this.checkFallOutOfWorld()
             }
         })
 
