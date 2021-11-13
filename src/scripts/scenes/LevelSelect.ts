@@ -110,7 +110,7 @@ export default class LevelSelectScene extends Phaser.Scene {
     }
 
     onRight() {
-        if (this.selectPage < Math.floor(this.levels.length / 6)) {
+        if ((this.selectPage + 1) * 6 < this.levels.length) {
             this.selectPage++
         }
         this.refreshSelectPage()
