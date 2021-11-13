@@ -30,6 +30,10 @@ export default class Block extends Phaser.Physics.Arcade.Image {
         }
     }
 
+    get hasTween() {
+        return this.scene.tweens.getTweensOf(this).length !== 0
+    }
+
     get gridCoordinates() {
         return phaserCoordinatesToGrid(this.body.position)
     }

@@ -192,6 +192,7 @@ const stockLevels = [
         height: 12,
         playerStart: { x: 10, y: 6 },
         blocks: [
+            { x: 10, y: 7, code: 'a' },
             { x: 10, y: 3, code: 'd' },
             { x: 9, y: 4, code: 'g' },
             { x: 8, y: 3, code: 'g' },

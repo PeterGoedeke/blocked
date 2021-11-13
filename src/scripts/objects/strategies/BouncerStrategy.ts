@@ -13,14 +13,16 @@ export default class BouncerStrategy extends BlockStrategy {
             player.setY(Math.floor(player.y / cellSize) * cellSize + cellSize / 2)
         }, 0)
 
-        this.block.scene.tweens.add({
-            targets: this.block,
-            scaleX: 0.7,
-            scaleY: 0.7,
-            duration: 70,
-            ease: 'Power2',
-            yoyo: true
-        })
+        if (!this.block.hasTween) {
+            this.block.scene.tweens.add({
+                targets: this.block,
+                scaleX: 0.7,
+                scaleY: 0.7,
+                duration: 70,
+                ease: 'Power2',
+                yoyo: true
+            })
+        }
     }
 
     get gridCoordinates() {
