@@ -13,7 +13,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setCollideWorldBounds(true)
 
         this.setDisplaySize(cellSize, cellSize)
-        this.speed = 500
+        this.speed = 600
     }
 
     get resting() {
@@ -29,7 +29,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         const v = gridCoordinatesToPhaser(vec)
         // console.log(vec)
         setTimeout(() => {
-            this.setPosition(v.x, v.y)
+            this.setPosition(Math.round(v.x), Math.round(v.y))
         }, 0)
         // console.log(v.x, v.y, cellSize * 9, cellSize * 8)
     }
