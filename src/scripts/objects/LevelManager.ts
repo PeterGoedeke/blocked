@@ -1,4 +1,6 @@
-const stockLevels: Level[] = [
+import unityLevels from './levels.json'
+
+const stockLevels = [
     {
         width: 21,
         height: 12,
@@ -342,7 +344,7 @@ const stockLevels: Level[] = [
             { x: 16, y: 10, code: 'a' }
         ]
     }
-]
+].concat(unityLevels)
 
 export const getStockLevel = async (i: number) => {
     if (i > stockLevels.length) {
