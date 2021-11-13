@@ -7,12 +7,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'player')
 
-        // this.play('player-anim')
+        this.play('player-anim')
         scene.add.existing(this)
         scene.physics.add.existing(this)
         this.setCollideWorldBounds(true)
 
-        this.setOrigin(0, 0)
         this.setDisplaySize(cellSize, cellSize)
         this.speed = 500
     }
@@ -39,5 +38,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.setPosition(Math.round(this.x), Math.round(this.y))
         clearTimeout(this.timeout)
         this.setVelocity(vec.x * this.speed, vec.y * this.speed)
+
+        this.setRotation(vec.angle() - Math.PI / 2)
     }
 }

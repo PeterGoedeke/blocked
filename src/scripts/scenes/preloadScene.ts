@@ -4,8 +4,14 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
+        // this.load.image('player', 'assets/img/player.png')
+
+        this.load.spritesheet('player', 'assets/img/player.png', {
+            frameWidth: 100,
+            frameHeight: 100
+        })
+
         this.load.image('block', 'assets/img/block.png')
-        this.load.image('player', 'assets/img/player.png')
         this.load.image('cloud', 'assets/img/cloud.png')
         this.load.image('key', 'assets/img/key.png')
         this.load.image('backdrop', 'assets/img/backdrop.png')
@@ -17,11 +23,14 @@ export default class PreloadScene extends Phaser.Scene {
         this.anims.create({
             key: 'player-anim',
             frames: this.anims.generateFrameNumbers('player', {
-                start: 1,
-                end: 1
+                start: 0,
+                end: 3
             }),
-            frameRate: 1,
-            repeat: -1
+            frameRate: 30,
+            repeat: -1,
+            repeatDelay: 8000,
+            delay: 5000,
+            yoyo: true
         })
 
         this.scene.start('MainMenuScene')

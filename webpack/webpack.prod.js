@@ -8,16 +8,16 @@ const prod = {
     mode: 'production',
     output: {
         filename: '[name].[contenthash].bundle.js',
-        chunkFilename: '[name].[contenthash].chunk.js',
+        chunkFilename: '[name].[contenthash].chunk.js'
     },
     optimization: {
         splitChunks: {
             cacheGroups: {
                 commons: {
-                    filename: '[name].[contenthash].bundle.js',
-                },
-            },
-        },
+                    filename: '[name].[contenthash].bundle.js'
+                }
+            }
+        }
     },
     plugins: [
         // disabled by default (uncomment to active)
@@ -29,7 +29,7 @@ const prod = {
         //   },
         //   ['vendors.*.js', 'sw.js']
         // )
-    ],
+    ]
 }
 
 module.exports = merge(common, prod)

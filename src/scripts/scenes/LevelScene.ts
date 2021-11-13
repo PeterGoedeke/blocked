@@ -57,7 +57,11 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     setPlayer(gridX: number, gridY: number) {
-        this.player = new Player(this, gridX * cellSize, gridY * cellSize)
+        this.player = new Player(
+            this,
+            gridX * cellSize + cellSize / 2,
+            gridY * cellSize + cellSize / 2
+        )
         this.entities.add(this.player)
     }
 
