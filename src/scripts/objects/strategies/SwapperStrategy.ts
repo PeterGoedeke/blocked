@@ -5,6 +5,16 @@ export default class SwapperStrategy extends BlockStrategy {
     handle(player: Player) {
         const d = this.gridCoordinates.subtract(player.gridCoordinates)
         player.setGridPosition(this.gridCoordinates.add(d))
+
+        this.block.scene.tweens.add({
+            targets: this.block,
+            scaleX: 0.65,
+            scaleY: 0.65,
+            alpha: 0.8,
+            duration: 100,
+            ease: 'Power2',
+            yoyo: true
+        })
     }
 
     get gridCoordinates() {

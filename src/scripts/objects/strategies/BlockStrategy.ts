@@ -2,7 +2,7 @@ import Block from '../Block'
 import Player from '../Player'
 
 export default abstract class BlockStrategy {
-    protected block: Block
+    block: Block
     texture: string
 
     constructor(block: Block, texture = 'block') {

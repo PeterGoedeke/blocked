@@ -11,6 +11,15 @@ export default class KeyStrategy extends BlockStrategy {
             throw Error(`Key at ${this.block.gridCoordinates} is not linked`)
         }
         this.door.unlock()
+        this.block.scene.tweens.add({
+            targets: this.door.block,
+            scaleX: 0.65,
+            scaleY: 0.65,
+            alpha: 0.8,
+            duration: 100,
+            ease: 'Power2',
+            yoyo: true
+        })
         this.block.destroy()
         this.block.setVisible(false)
     }

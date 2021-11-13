@@ -12,6 +12,15 @@ export default class BouncerStrategy extends BlockStrategy {
             player.setX(Math.round(player.x / cellSize) * cellSize)
             player.setY(Math.round(player.y / cellSize) * cellSize)
         }, 0)
+
+        this.block.scene.tweens.add({
+            targets: this.block,
+            scaleX: 0.7,
+            scaleY: 0.7,
+            duration: 70,
+            ease: 'Power2',
+            yoyo: true
+        })
     }
 
     get gridCoordinates() {

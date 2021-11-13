@@ -13,7 +13,6 @@ export default class Block extends Phaser.Physics.Arcade.Image {
         this.scene = scene
         scene.add.existing(this)
 
-        this.setOrigin(0, 0)
         this.setDisplaySize(cellSize, cellSize)
         this.setTint(tint)
     }

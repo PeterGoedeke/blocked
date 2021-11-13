@@ -17,6 +17,13 @@ export default class PlatformStrategy extends BlockStrategy {
             }
         }, 300)
 
+        this.block.scene.tweens.add({
+            targets: this.block,
+            alpha: 0,
+            duration: 300,
+            ease: 'Power2'
+        })
+
         player.timeout = timeout
     }
 

@@ -13,6 +13,16 @@ export default class TeleporterStrategy extends BlockStrategy {
             throw Error(`Block at ${this.block.gridCoordinates} is not linked`)
         }
         player.setGridPosition(this.other.blockGridCoordinates().add(d))
+
+        this.block.scene.tweens.add({
+            targets: [this.block, this.other.block],
+            scaleX: 0.65,
+            scaleY: 0.65,
+            alpha: 0.8,
+            duration: 100,
+            ease: 'Power2',
+            yoyo: true
+        })
     }
 
     override link(strategy: BlockStrategy) {
