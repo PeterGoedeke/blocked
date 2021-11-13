@@ -40,6 +40,12 @@ export default class LevelEditorScene extends Phaser.Scene {
     }
 
     create() {
+        this.blocks = []
+        this.level.blocks = []
+        this.lines = []
+        this.activeBlockData = getBlockList()[0]
+        this.linking = false
+
         const backgroundGrid = this.add.grid(
             0,
             0,
@@ -102,9 +108,7 @@ export default class LevelEditorScene extends Phaser.Scene {
             image.on('pointerdown', () => {
                 this.activeBlockData = block
                 this.activeBlockImage.setTint(block.tint)
-                if (block.texture) {
-                    this.activeBlockImage.setTexture(block.texture)
-                }
+                this.activeBlockImage.setTexture(block.texture || 'block')
             })
         })
 
@@ -160,7 +164,6 @@ export default class LevelEditorScene extends Phaser.Scene {
                 } else {
                     block.destroy()
 
-                    console.log(block.x, block.y, this.level.blocks)
                     this.level.blocks.splice(
                         this.level.blocks.findIndex(
                             b => b.x === gridLocation.x && b.y === gridLocation.y
@@ -169,14 +172,15 @@ export default class LevelEditorScene extends Phaser.Scene {
                     )
                 }
                 this.refreshLines()
+                console.log(JSON.stringify(this.level))
+                this.copyTextToClipboard(JSON.stringify(this.level))
             })
 
-            console.log(this.level)
             console.log(JSON.stringify(this.level))
+            this.copyTextToClipboard(JSON.stringify(this.level))
         })
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
-            console.log(event.key)
             if (event.key === 'Escape') {
                 this.onMainMenu()
             }
@@ -223,5 +227,43 @@ export default class LevelEditorScene extends Phaser.Scene {
 
     onMainMenu() {
         this.scene.start('MainMenuScene')
+    }
+
+    fallbackCopyTextToClipboard(text: string) {
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+
+        // Avoid scrolling to bottom
+        textArea.style.top = '0'
+        textArea.style.left = '0'
+        textArea.style.position = 'fixed'
+
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+
+        try {
+            const successful = document.execCommand('copy')
+            const msg = successful ? 'successful' : 'unsuccessful'
+            console.log('Fallback: Copying text command was ' + msg)
+        } catch (err) {
+            console.error('Fallback: Oops, unable to copy', err)
+        }
+
+        document.body.removeChild(textArea)
+    }
+    copyTextToClipboard(text: string) {
+        if (!navigator.clipboard) {
+            this.fallbackCopyTextToClipboard(text)
+            return
+        }
+        navigator.clipboard.writeText(text).then(
+            function () {
+                console.log('Async: Copying to clipboard was successful!')
+            },
+            function (err) {
+                console.error('Async: Could not copy text: ', err)
+            }
+        )
     }
 }
