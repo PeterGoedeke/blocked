@@ -36,6 +36,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     setGridDirection(vec: Phaser.Math.Vector2) {
+        this.setPosition(Math.round(this.x), Math.round(this.y))
         clearTimeout(this.timeout)
         this.setVelocity(vec.x * this.speed, vec.y * this.speed)
     }
