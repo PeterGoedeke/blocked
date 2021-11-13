@@ -19,7 +19,7 @@ export default class Cloud extends Phaser.Physics.Arcade.Sprite {
     preUpdate(time: number, delta: number) {
         super.preUpdate(time, delta)
 
-        if (this.x < -this.width) {
+        if (this.x < -this.width * 1.5) {
             this.restart()
         }
     }
