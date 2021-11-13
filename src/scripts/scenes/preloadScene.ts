@@ -9,6 +9,8 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('cloud', 'assets/img/cloud.png')
         this.load.image('key', 'assets/img/key.png')
         this.load.image('backdrop', 'assets/img/backdrop.png')
+
+        this.load.audio('music', 'assets/music/b.mp3')
     }
 
     create() {

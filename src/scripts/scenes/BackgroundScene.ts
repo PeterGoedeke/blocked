@@ -9,6 +9,13 @@ export default class BackgroundScene extends Phaser.Scene {
         const background = this.add.image(0, 0, 'backdrop')
         background.setOrigin(0, 0)
         background.setDisplaySize(this.cameras.main.width, this.cameras.main.height)
+
+        const music = this.sound.add('music', {
+            mute: false,
+            volume: 0.3,
+            loop: true
+        })
+        music.play()
     }
 
     update() {
