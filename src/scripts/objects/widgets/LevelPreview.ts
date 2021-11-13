@@ -36,7 +36,7 @@ export default class LevelPreview extends Phaser.GameObjects.Container {
             scene,
             level.playerStart.x * scale,
             level.playerStart.y * scale,
-            'block'
+            'player'
         )
         player.setOrigin(0, 0)
         player.setDisplaySize(scale, scale)
