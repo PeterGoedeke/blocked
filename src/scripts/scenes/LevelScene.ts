@@ -143,10 +143,13 @@ export default class LevelScene extends Phaser.Scene {
 
     update() {
         if (
-            !this.physics.world.bounds.contains(this.player.x, this.player.y) ||
             !this.physics.world.bounds.contains(
-                this.player.x + this.player.displayWidth,
-                this.player.y + this.player.displayHeight
+                this.player.x - this.player.displayWidth / 2,
+                this.player.y - this.player.displayHeight / 2
+            ) ||
+            !this.physics.world.bounds.contains(
+                this.player.x + this.player.displayWidth / 2,
+                this.player.y + this.player.displayHeight / 2
             )
         ) {
             this.scene.restart()

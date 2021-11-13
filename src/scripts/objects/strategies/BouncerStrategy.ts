@@ -6,11 +6,11 @@ export default class BouncerStrategy extends BlockStrategy {
     handle(player: Player) {
         const d = this.gridCoordinates.subtract(player.gridCoordinates)
         d.rotate(-Math.PI / 2)
-        player.setGridDirection(d)
+        player.setGridDirection(new Phaser.Math.Vector2(Math.round(d.x), Math.round(d.y)))
 
         setTimeout(() => {
-            player.setX(Math.round(player.x / cellSize) * cellSize)
-            player.setY(Math.round(player.y / cellSize) * cellSize)
+            player.setX(Math.floor(player.x / cellSize) * cellSize + cellSize / 2)
+            player.setY(Math.floor(player.y / cellSize) * cellSize + cellSize / 2)
         }, 0)
 
         this.block.scene.tweens.add({

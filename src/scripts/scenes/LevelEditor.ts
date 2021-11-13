@@ -1,5 +1,5 @@
 import { getBlockList } from '../objects/BlockFactory'
-import { gridCoordinatesToPhaser, phaserCoordinatesToLevelEditor } from '../objects/GridManager'
+import { levelEditorToPhaser, phaserCoordinatesToLevelEditor } from '../objects/GridManager'
 import MenuItem from '../objects/widgets/MenuItem'
 
 export default class LevelEditorScene extends Phaser.Scene {
@@ -133,7 +133,7 @@ export default class LevelEditorScene extends Phaser.Scene {
 
             const click = new Phaser.Math.Vector2(x, y)
             const gridLocation = phaserCoordinatesToLevelEditor(click, this.cellSize)
-            const location = gridCoordinatesToPhaser(gridLocation, this.cellSize)
+            const location = levelEditorToPhaser(gridLocation, this.cellSize)
 
             const block = this.add.image(
                 location.x,
