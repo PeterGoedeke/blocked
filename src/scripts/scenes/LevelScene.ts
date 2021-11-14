@@ -16,9 +16,7 @@ export default class LevelScene extends Phaser.Scene {
     pickups!: Phaser.Physics.Arcade.Group
     entities!: Phaser.Physics.Arcade.Group
 
-    level!: Level
-    series!: string
-    index!: number
+    level!: GameLevel
 
     blockFactory: BlockFactory
     links: Links
@@ -33,9 +31,7 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     async init(data: GameLevel) {
-        this.level = data.level
-        this.series = data.series
-        this.index = data.index
+        this.level = data
         this.active = true
     }
 
@@ -164,9 +160,7 @@ export default class LevelScene extends Phaser.Scene {
             if (event.key === 'Escape') {
                 this.scene.launch('MenuOverlayScene', {
                     wonLevel: false,
-                    levelScene: this.scene,
-                    series: this.series,
-                    index: this.index
+                    levelScene: this.scene
                 })
                 this.scene.pause()
             }

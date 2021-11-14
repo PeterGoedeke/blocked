@@ -4,15 +4,11 @@ import MenuItem from '../objects/widgets/MenuItem'
 interface InitData {
     wonLevel: boolean
     levelScene: Phaser.Scenes.ScenePlugin
-    series: string
-    index: number
 }
 
 export default class MenuOverlayScene extends Phaser.Scene {
     levelScene!: Phaser.Scenes.ScenePlugin
     wonLevel!: boolean
-    series!: string
-    index!: number
 
     constructor() {
         super({ key: 'MenuOverlayScene' })
@@ -21,10 +17,6 @@ export default class MenuOverlayScene extends Phaser.Scene {
     init(data: InitData) {
         this.levelScene = data.levelScene
         this.wonLevel = data.wonLevel
-        this.series = data.series
-        this.index = data.index
-
-        console.log(this.wonLevel)
     }
 
     create() {
@@ -64,7 +56,6 @@ export default class MenuOverlayScene extends Phaser.Scene {
         })
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
-            console.log(event.key)
             if (event.key === 'Escape') {
                 if (!this.wonLevel) {
                     this.scene.resume('LevelScene')
@@ -83,19 +74,9 @@ export default class MenuOverlayScene extends Phaser.Scene {
     }
 
     async onNextLevel() {
-        const level = await getNextLevel(this.series, this.index)
-
+        this.scene.wake('LevelSelectScene')
+        this.scene.stop()
         this.levelScene.stop()
-
-        if (level) {
-            this.scene.start('LevelScene', {
-                series: this.series,
-                index: this.index + 1,
-                level
-            })
-        } else {
-            this.scene.start('MainMenuScene')
-        }
     }
 
     onRestart() {
@@ -112,9 +93,5 @@ export default class MenuOverlayScene extends Phaser.Scene {
     onMainMenu() {
         this.scene.start('MainMenuScene')
         this.levelScene.stop()
-    }
-
-    update() {
-        // test
     }
 }

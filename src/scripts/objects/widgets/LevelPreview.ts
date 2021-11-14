@@ -1,21 +1,21 @@
 import { getBlockData } from '../BlockFactory'
 
 export default class LevelPreview extends Phaser.GameObjects.Container {
-    level: Level
-    index: number
+    level: GameLevel
+    name: string
 
     constructor(
         scene: Phaser.Scene,
         x: number,
         y: number,
         scale: number,
-        level: Level,
-        index: number
+        level: GameLevel,
+        name: string
     ) {
         super(scene, x, y)
 
         this.level = level
-        this.index = index
+        this.name = name
 
         for (const block of level?.blocks) {
             const blockData = getBlockData(block.code)
@@ -55,18 +55,12 @@ export default class LevelPreview extends Phaser.GameObjects.Container {
         border.isFilled = false
         this.add(border)
 
-        const text = new Phaser.GameObjects.Text(
-            this.scene,
-            scale / 2,
-            scale / 4,
-            (this.index + 1).toString(),
-            {
-                fontSize: '32px',
-                fontFamily: 'Roboto',
-                stroke: 'black',
-                strokeThickness: 1.5
-            }
-        )
+        const text = new Phaser.GameObjects.Text(this.scene, scale / 2, scale / 4, name, {
+            fontSize: '32px',
+            fontFamily: 'Roboto',
+            stroke: 'black',
+            strokeThickness: 1.5
+        })
         this.add(text)
 
         this.setInteractive(border, Phaser.Geom.Rectangle.Contains)

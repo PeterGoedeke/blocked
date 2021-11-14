@@ -6,9 +6,7 @@ export default class WinStrategy extends BlockStrategy {
     handle(player: Player) {
         this.block.scene.scene.launch('MenuOverlayScene', {
             wonLevel: true,
-            levelScene: this.block.scene.scene,
-            series: this.block.scene.series,
-            index: this.block.scene.index
+            levelScene: this.block.scene.scene
         })
 
         this.block.scene.tweens.add({

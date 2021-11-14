@@ -5,19 +5,22 @@ export default class LevelSelectScene extends Phaser.Scene {
     levelScene!: Phaser.Scenes.ScenePlugin
     selectPage: number
     levelPreviews: LevelPreview[]
-    levels!: Level[]
+    folder!: Folder
+    currentIndex: number | undefined
 
     constructor() {
         super({ key: 'LevelSelectScene' })
 
         this.selectPage = 0
         this.levelPreviews = []
+        this.currentIndex = undefined
     }
 
-    async init(levels: Level[]) {
-        this.levels = levels
+    async init(folder: Folder) {
+        this.folder = folder
         this.levelPreviews = []
         this.selectPage = 0
+        this.currentIndex = undefined
     }
 
     async create() {
@@ -44,13 +47,12 @@ export default class LevelSelectScene extends Phaser.Scene {
         })
 
         backButton.on('pointerdown', () => {
-            this.onMainMenu()
+            this.onBack()
         })
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
-            console.log(event.key)
             if (event.key === 'Escape') {
-                this.onMainMenu()
+                this.onBack()
             } else if (event.key === 'ArrowLeft') {
                 this.onLeft()
             } else if (event.key === 'ArrowRight') {
@@ -58,23 +60,19 @@ export default class LevelSelectScene extends Phaser.Scene {
             } else if (!isNaN(Number.parseInt(event.key))) {
                 const int = Number.parseInt(event.key)
                 const index = int - 1 + this.selectPage * 6
-                this.scene.start('LevelScene', {
-                    series: 'stock',
-                    index,
-                    level: this.levels[index]
-                })
+                this.onSelect(index)
             }
         })
 
         const smallSize = 18
-        for (let i = 0; i < this.levels.length; i++) {
+        for (let i = 0; i < this.folder.levels.length; i++) {
             const row = i % 3
             const col = i % 6 >= 3 ? 1 : 0
 
-            const level = this.levels[i]
+            const level = this.folder.levels[i]
 
-            const boxWidth = level.width + 1
-            const boxHeight = level.height + 1
+            const boxWidth = level.gameLevel.width + 1
+            const boxHeight = level.gameLevel.height + 1
 
             const preview = new LevelPreview(
                 this,
@@ -83,16 +81,12 @@ export default class LevelSelectScene extends Phaser.Scene {
                     boxWidth / 2,
                 smallSize * boxHeight - 50 + col * smallSize * boxHeight,
                 smallSize,
-                level,
-                i
+                level.gameLevel,
+                level.name
             )
 
             preview.on('pointerdown', () => {
-                this.scene.start('LevelScene', {
-                    series: 'stock',
-                    index: i,
-                    level
-                })
+                this.onSelect(i)
             })
 
             this.children.add(preview)
@@ -100,6 +94,21 @@ export default class LevelSelectScene extends Phaser.Scene {
         }
 
         this.refreshSelectPage()
+
+        this.events.removeAllListeners(Phaser.Scenes.Events.WAKE)
+        this.events.on(Phaser.Scenes.Events.WAKE, () => {
+            if (this.currentIndex !== undefined) {
+                this.onSelect(this.currentIndex + 1)
+            }
+        })
+    }
+
+    onSelect(index: number) {
+        this.currentIndex = index
+        if (index < this.folder.levels.length) {
+            this.scene.launch('LevelScene', this.folder.levels[index].gameLevel)
+            this.scene.sleep()
+        }
     }
 
     onLeft() {
@@ -110,7 +119,7 @@ export default class LevelSelectScene extends Phaser.Scene {
     }
 
     onRight() {
-        if ((this.selectPage + 1) * 6 < this.levels.length) {
+        if ((this.selectPage + 1) * 6 < this.folder.levels.length) {
             this.selectPage++
         }
         this.refreshSelectPage()
@@ -123,7 +132,7 @@ export default class LevelSelectScene extends Phaser.Scene {
             .forEach(preview => preview.setVisible(true))
     }
 
-    onMainMenu() {
-        this.scene.start('MainMenuScene')
+    onBack() {
+        this.scene.start('FolderSelectScene')
     }
 }
