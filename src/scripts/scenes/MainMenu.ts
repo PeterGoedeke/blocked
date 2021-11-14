@@ -1,4 +1,4 @@
-import { getAllLevels } from '../objects/LevelManager'
+import { getAllLevels, getStockLevels } from '../objects/LevelManager'
 import MenuItem from '../objects/widgets/MenuItem'
 
 export default class MainMenuScene extends Phaser.Scene {
@@ -37,7 +37,6 @@ export default class MainMenuScene extends Phaser.Scene {
         })
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
-            console.log(event.key)
             if (event.key === 'g' || event.key === 'ArrowLeft') {
                 this.onLevelSelect()
             } else if (event.key === 's' || event.key === 'ArrowUp') {
@@ -49,8 +48,8 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     async onLevelSelect() {
-        const levels = await getAllLevels('stock')
-        this.scene.start('LevelSelectScene', levels)
+        const folders = await getStockLevels()
+        this.scene.start('FolderSelectScene', folders)
     }
 
     onSettings() {
