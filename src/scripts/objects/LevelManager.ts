@@ -1,6 +1,8 @@
 import unityLevels from './levels.json'
 import axios from 'axios'
 
+axios.defaults.baseURL = process.env.serverURL
+
 const sortLevelsToFolders = (levels: Level[]): Folder[] => {
     const folders = levels.reduce((acc: Record<string, Level[]>, cur) => {
         if (!acc[cur.folderName]) {
@@ -363,7 +365,7 @@ const stockLevels = [
 ].concat(unityLevels)
 
 export const getStockLevels = async () => {
-    const res = await axios.get('http://localhost:5000/levels', {
+    const res = await axios.get('levels', {
         params: {
             adminOnly: true
         }

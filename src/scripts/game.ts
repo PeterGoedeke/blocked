@@ -1,6 +1,7 @@
 import 'phaser'
 import BackgroundScene from './scenes/BackgroundScene'
 import CloudScene from './scenes/CloudScene'
+import FolderSelectScene from './scenes/FolderSelect'
 import LevelEditorScene from './scenes/LevelEditor'
 import LevelScene from './scenes/LevelScene'
 import LevelSelectScene from './scenes/LevelSelect'
@@ -29,7 +30,8 @@ const config = {
         MainMenuScene,
         LevelSelectScene,
         LevelEditorScene,
-        BackgroundScene
+        BackgroundScene,
+        FolderSelectScene
     ],
     physics: {
         default: 'arcade',

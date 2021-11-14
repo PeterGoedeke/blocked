@@ -5,6 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { InjectManifest } = require('workbox-webpack-plugin')
 const webpack = require('webpack')
 
+const dotenv = require('dotenv').config({ path: './.env' })
+
 module.exports = {
     entry: ['./src/scripts/game.ts'],
     output: {
@@ -49,6 +51,9 @@ module.exports = {
         new InjectManifest({
             swSrc: path.resolve(__dirname, '../pwa/sw.js'),
             swDest: 'sw.js'
+        }),
+        new webpack.DefinePlugin({
+            'process.env': JSON.stringify(dotenv.parsed)
         })
     ]
 }
