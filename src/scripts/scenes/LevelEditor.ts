@@ -11,7 +11,7 @@ export default class LevelEditorScene extends Phaser.Scene {
 
     activeBlockImage!: Phaser.GameObjects.Image
     blocks: Phaser.GameObjects.Image[]
-    level: Level
+    level: GameLevel
     linking: boolean
     lines: Phaser.GameObjects.Line[]
     cellSize: number
