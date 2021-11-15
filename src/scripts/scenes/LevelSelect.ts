@@ -7,6 +7,7 @@ export default class LevelSelectScene extends Phaser.Scene {
     levelPreviews: LevelPreview[]
     folder!: Folder
     currentIndex: number | undefined
+    editMode: boolean
 
     constructor() {
         super({ key: 'LevelSelectScene' })
@@ -14,6 +15,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         this.selectPage = 0
         this.levelPreviews = []
         this.currentIndex = undefined
+        this.editMode = false
     }
 
     async init(folder: Folder) {
@@ -21,6 +23,7 @@ export default class LevelSelectScene extends Phaser.Scene {
         this.levelPreviews = []
         this.selectPage = 0
         this.currentIndex = undefined
+        this.editMode = false
     }
 
     async create() {
@@ -38,6 +41,11 @@ export default class LevelSelectScene extends Phaser.Scene {
         backButton.setFontSize(64 + 32)
         this.children.add(backButton)
 
+        const editButton = new MenuItem(this, this.cameras.main.width - 50, 40, 'Edit')
+        editButton.setFontSize(48)
+        editButton.setAlpha(0.1)
+        this.children.add(editButton)
+
         leftButton.on('pointerdown', () => {
             this.onLeft()
         })
@@ -48,6 +56,11 @@ export default class LevelSelectScene extends Phaser.Scene {
 
         backButton.on('pointerdown', () => {
             this.onBack()
+        })
+
+        editButton.on('pointerdown', () => {
+            this.editMode = !this.editMode
+            editButton.setAlpha(this.editMode ? 1 : 0.1)
         })
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
@@ -106,8 +119,15 @@ export default class LevelSelectScene extends Phaser.Scene {
     onSelect(index: number) {
         this.currentIndex = index
         if (index < this.folder.levels.length) {
-            this.scene.launch('LevelScene', this.folder.levels[index].gameLevel)
-            this.scene.sleep()
+            this.scene.launch(
+                this.editMode ? 'LevelEditorScene' : 'LevelScene',
+                this.folder.levels[index].gameLevel
+            )
+            if (this.editMode) {
+                this.scene.stop()
+            } else {
+                this.scene.sleep()
+            }
         }
     }
 

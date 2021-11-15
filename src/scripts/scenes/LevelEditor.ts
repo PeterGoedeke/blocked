@@ -1,4 +1,4 @@
-import { getBlockList } from '../objects/BlockFactory'
+import { getBlockData, getBlockList } from '../objects/BlockFactory'
 import { levelEditorToPhaser, phaserCoordinatesToLevelEditor } from '../objects/GridManager'
 import MenuItem from '../objects/widgets/MenuItem'
 
@@ -16,6 +16,12 @@ export default class LevelEditorScene extends Phaser.Scene {
     lines: Phaser.GameObjects.Line[]
     cellSize: number
     toolbarCellSize: number
+
+    init(data: GameLevel | undefined) {
+        if (data && data.blocks) {
+            this.level = data
+        }
+    }
 
     constructor() {
         super({ key: 'LevelEditorScene' })
@@ -41,10 +47,9 @@ export default class LevelEditorScene extends Phaser.Scene {
 
     create() {
         this.blocks = []
-        this.level.blocks = []
+        this.linking = false
         this.lines = []
         this.activeBlockData = getBlockList()[0]
-        this.linking = false
 
         const backgroundGrid = this.add.grid(
             0,
@@ -57,11 +62,17 @@ export default class LevelEditorScene extends Phaser.Scene {
             undefined,
             0xffffff,
             1
-            // undefined,
-            // 0
         )
         backgroundGrid.setOrigin(0, 0)
         backgroundGrid.setInteractive()
+
+        this.level.blocks.forEach(block =>
+            this.addBlock(new Phaser.Math.Vector2(block.x, block.y), {
+                code: block.code,
+                ...getBlockData(block.code)
+            })
+        )
+        this.refreshLines()
 
         const backButton = new MenuItem(this, this.cameras.main.width - 40, 40, '<', true)
         this.children.add(backButton)
@@ -128,56 +139,22 @@ export default class LevelEditorScene extends Phaser.Scene {
         })
 
         backgroundGrid.on('pointerdown', (event: any) => {
-            const x: number = event.downX
-            const y: number = event.downY
-
-            const click = new Phaser.Math.Vector2(x, y)
+            const click = new Phaser.Math.Vector2(event.downX, event.downY)
             const gridLocation = phaserCoordinatesToLevelEditor(click, this.cellSize)
-            const location = levelEditorToPhaser(gridLocation, this.cellSize)
 
-            const block = this.add.image(
-                location.x,
-                location.y,
-                this.activeBlockData.texture || 'block'
-            )
-            block.setOrigin(0, 0)
-            block.setTint(this.activeBlockData.tint)
-            block.setDisplaySize(this.cellSize, this.cellSize)
-            block.setInteractive()
+            const blockData = {
+                tint: this.activeBlockData.tint,
+                code: this.activeBlockData.code,
+                texture: this.activeBlockData.texture
+            }
 
             this.level.blocks.push({
                 x: gridLocation.x,
                 y: gridLocation.y,
-                code: this.activeBlockData.code
-            })
-            this.blocks.push(block)
-
-            block.on('pointerdown', () => {
-                if (this.linking) {
-                    const linkBlock = this.getBlock(gridLocation.x, gridLocation.y)
-
-                    if (linkBlock.linkCode === undefined) {
-                        linkBlock.linkCode = 0
-                    } else {
-                        linkBlock.linkCode = (linkBlock.linkCode + 1) % 4
-                    }
-                } else {
-                    block.destroy()
-
-                    this.level.blocks.splice(
-                        this.level.blocks.findIndex(
-                            b => b.x === gridLocation.x && b.y === gridLocation.y
-                        ),
-                        1
-                    )
-                }
-                this.refreshLines()
-                console.log(JSON.stringify(this.level))
-                this.copyTextToClipboard(JSON.stringify(this.level))
+                code: blockData.code
             })
 
-            console.log(JSON.stringify(this.level))
-            this.copyTextToClipboard(JSON.stringify(this.level))
+            this.addBlock(gridLocation, blockData)
         })
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
@@ -185,6 +162,48 @@ export default class LevelEditorScene extends Phaser.Scene {
                 this.onMainMenu()
             }
         })
+    }
+
+    addBlock(
+        gridLocation: Phaser.Math.Vector2,
+        blockData: { tint: number; texture?: string; code: string }
+    ) {
+        const location = levelEditorToPhaser(gridLocation, this.cellSize)
+
+        const block = this.add.image(location.x, location.y, blockData.texture || 'block')
+        block.setOrigin(0, 0)
+        block.setTint(blockData.tint)
+        block.setDisplaySize(this.cellSize, this.cellSize)
+        block.setInteractive()
+
+        this.blocks.push(block)
+
+        block.on('pointerdown', () => {
+            if (this.linking) {
+                const linkBlock = this.getBlock(gridLocation.x, gridLocation.y)
+
+                if (linkBlock.linkCode === undefined) {
+                    linkBlock.linkCode = 0
+                } else {
+                    linkBlock.linkCode = (linkBlock.linkCode + 1) % 4
+                }
+            } else {
+                block.destroy()
+
+                this.level.blocks.splice(
+                    this.level.blocks.findIndex(
+                        b => b.x === gridLocation.x && b.y === gridLocation.y
+                    ),
+                    1
+                )
+            }
+            this.refreshLines()
+            console.log(JSON.stringify(this.level))
+            this.copyTextToClipboard(JSON.stringify(this.level))
+        })
+
+        console.log(JSON.stringify(this.level))
+        this.copyTextToClipboard(JSON.stringify(this.level))
     }
 
     getBlock(x: number, y: number) {
