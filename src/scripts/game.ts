@@ -22,6 +22,9 @@ const config = {
         width: DEFAULT_WIDTH,
         height: DEFAULT_HEIGHT
     },
+    dom: {
+        createContainer: true
+    },
     scene: [
         PreloadScene,
         LevelScene,

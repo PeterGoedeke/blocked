@@ -1,21 +1,5 @@
 import unityLevels from './levels.json'
-import axios from 'axios'
-
-axios.defaults.baseURL = process.env.serverURL
-
-const sortLevelsToFolders = (levels: Level[]): Folder[] => {
-    const folders = levels.reduce((acc: Record<string, Level[]>, cur) => {
-        if (!acc[cur.folderName]) {
-            acc[cur.folderName] = []
-        }
-        acc[cur.folderName].push(cur)
-        return acc
-    }, {})
-
-    return Object.keys(folders)
-        .sort()
-        .map(key => ({ folderName: key, levels: folders[key] }))
-}
+import client from '../client'
 
 const stockLevels = [
     {
@@ -363,17 +347,6 @@ const stockLevels = [
         ]
     }
 ].concat(unityLevels)
-
-export const getStockLevels = async () => {
-    const res = await axios.get('levels', {
-        params: {
-            adminOnly: true
-        }
-    })
-    const levels: Level[] = res.data.levels
-    const folders = sortLevelsToFolders(levels)
-    return folders
-}
 
 export const getStockLevel = async (i: number) => {
     if (i > stockLevels.length) {

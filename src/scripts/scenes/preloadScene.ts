@@ -16,6 +16,8 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('key', 'assets/img/key.png')
         this.load.image('backdrop', 'assets/img/backdrop.png')
 
+        this.load.html('form', 'assets/html/loginform.html')
+
         this.load.audio('music', 'assets/music/b.mp3')
     }
 
