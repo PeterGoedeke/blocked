@@ -2,7 +2,6 @@ import Block from '../objects/Block'
 import BlockFactory, { isPickup } from '../objects/BlockFactory'
 import { cellSize } from '../objects/GridManager'
 import Player from '../objects/Player'
-import '../objects/LevelManager'
 import BlockStrategy from '../objects/strategies/BlockStrategy'
 
 interface Links {
