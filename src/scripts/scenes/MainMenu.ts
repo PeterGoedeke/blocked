@@ -5,6 +5,7 @@ export default class MainMenuScene extends Phaser.Scene {
     levelScene!: Phaser.Scenes.ScenePlugin
     form!: Phaser.GameObjects.DOMElement
     loginButton!: MenuItem
+    username!: MenuItem
 
     constructor() {
         super({ key: 'MainMenuScene' })
@@ -17,15 +18,30 @@ export default class MainMenuScene extends Phaser.Scene {
         const title = new MenuItem(this, centreX, quarterY * 0.5, 'BLOCKED')
         title.setFontSize(128)
 
+        this.username = new MenuItem(
+            this,
+            this.cameras.main.width - 200,
+            this.cameras.main.height - 30,
+            'Not logged in'
+        )
+        this.username.setFontSize(32)
+
         const levelSelectButton = new MenuItem(this, centreX, quarterY * 1.5, 'Level Select', true)
-        const settingsButton = new MenuItem(this, centreX, quarterY * 2, 'Settings', true)
+        const communityLevelsButton = new MenuItem(
+            this,
+            centreX,
+            quarterY * 2,
+            'Community Levels',
+            true
+        )
         const levelEditorButton = new MenuItem(this, centreX, quarterY * 2.5, 'Level Editor', true)
         this.loginButton = new MenuItem(this, centreX, quarterY * 3, 'Login', true)
         const myLevelsButton = new MenuItem(this, centreX, quarterY * 3.5, 'My Levels', true)
 
         this.children.add(title)
+        this.children.add(this.username)
         this.children.add(levelSelectButton)
-        this.children.add(settingsButton)
+        this.children.add(communityLevelsButton)
         this.children.add(levelEditorButton)
         this.children.add(this.loginButton)
         this.children.add(myLevelsButton)
@@ -34,8 +50,8 @@ export default class MainMenuScene extends Phaser.Scene {
             this.onLevelSelect()
         })
 
-        settingsButton.on('pointerdown', () => {
-            this.onSettings()
+        communityLevelsButton.on('pointerdown', () => {
+            this.onCommunityLevels()
         })
 
         levelEditorButton.on('pointerdown', () => {
@@ -57,7 +73,7 @@ export default class MainMenuScene extends Phaser.Scene {
             const inputUsername = <HTMLInputElement>this.form.getChildByName('username')
             const inputPassword = <HTMLInputElement>this.form.getChildByName('password')
 
-            if (event.target.name === 'this.loginButton') {
+            if (event.target.name === 'loginButton') {
                 //  Have they entered anything?
                 if (inputUsername.value !== '' && inputPassword.value !== '') {
                     const res = await client.login(inputUsername.value, inputPassword.value)
@@ -66,7 +82,10 @@ export default class MainMenuScene extends Phaser.Scene {
                     // this.form.removeListener('click')
 
                     //  Populate the text with whatever they typed in as the username!
-                    this.loginButton.setText('Welcome ' + inputUsername.value)
+                    this.loginButton.setText('Logout')
+                    this.username.setText(inputUsername.value)
+                    this.form.setVisible(false)
+                    this.scene.resume()
                 }
             }
         })
@@ -100,23 +119,37 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     onLogin() {
-        this.form.setVisible(true)
-        this.tweens.add({
-            targets: this.form,
-            y: 300,
-            duration: 3000,
-            ease: 'Power3'
-        })
-        this.scene.pause()
+        if (!client.isAuthenticated()) {
+            this.form.setVisible(true)
+            this.tweens.add({
+                targets: this.form,
+                y: 300,
+                duration: 3000,
+                ease: 'Power3'
+            })
+            this.scene.pause()
+        } else {
+            client.logout()
+            this.loginButton.setText('Login')
+            this.username.setText('Not logged in')
+        }
     }
 
     onAuthenticated() {
         const username = client.getAuthenticatedUsername()
-        this.loginButton.setText(username)
+        this.loginButton.setText('Logout')
+        this.username.setText(username)
     }
 
     async onMyLevels() {
-        const folders = await client.getMyLevels()
+        if (client.isAuthenticated()) {
+            const folders = await client.getMyLevels()
+            this.scene.start('FolderSelectScene', folders)
+        }
+    }
+
+    async onCommunityLevels() {
+        const folders = await client.getFeaturedLevels()
         this.scene.start('FolderSelectScene', folders)
     }
 }
