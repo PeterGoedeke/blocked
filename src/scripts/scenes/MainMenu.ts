@@ -1,9 +1,10 @@
 import client from '../client'
+import LoginForm from '../objects/widgets/LoginForm'
 import MenuItem from '../objects/widgets/MenuItem'
 
 export default class MainMenuScene extends Phaser.Scene {
     levelScene!: Phaser.Scenes.ScenePlugin
-    form!: Phaser.GameObjects.DOMElement
+    form!: LoginForm
     loginButton!: MenuItem
     username!: MenuItem
 
@@ -66,28 +67,13 @@ export default class MainMenuScene extends Phaser.Scene {
             this.onMyLevels()
         })
 
-        this.form = this.add.dom(centreX, quarterY).createFromCache('form')
+        this.form = new LoginForm(this)
+        this.children.add(this.form)
         this.form.setVisible(false)
+
         this.form.addListener('click')
-        this.form.on('click', async (event: any) => {
-            const inputUsername = <HTMLInputElement>this.form.getChildByName('username')
-            const inputPassword = <HTMLInputElement>this.form.getChildByName('password')
-
-            if (event.target.name === 'loginButton') {
-                //  Have they entered anything?
-                if (inputUsername.value !== '' && inputPassword.value !== '') {
-                    const res = await client.login(inputUsername.value, inputPassword.value)
-                    this.onAuthenticated()
-                    //  Turn off the click events
-                    // this.form.removeListener('click')
-
-                    //  Populate the text with whatever they typed in as the username!
-                    this.loginButton.setText('Logout')
-                    this.username.setText(inputUsername.value)
-                    this.form.setVisible(false)
-                    this.scene.resume()
-                }
-            }
+        this.form.on('click', (e: any) => {
+            this.form.onClick(e)
         })
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
@@ -120,12 +106,10 @@ export default class MainMenuScene extends Phaser.Scene {
 
     onLogin() {
         if (!client.isAuthenticated()) {
-            this.form.setVisible(true)
-            this.tweens.add({
-                targets: this.form,
-                y: 300,
-                duration: 3000,
-                ease: 'Power3'
+            this.form.popup('Login', async (user: User) => {
+                await client.login(user.username, user.password)
+                this.onAuthenticated()
+                this.scene.resume()
             })
             this.scene.pause()
         } else {

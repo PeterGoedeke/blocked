@@ -26,6 +26,11 @@ interface LevelInDTO {
     index: number
 }
 
+interface User {
+    username: string
+    password: string
+}
+
 interface Level {
     /**
      * The id of the level

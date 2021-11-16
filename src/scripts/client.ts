@@ -50,9 +50,7 @@ export default {
         if (res.status === 200) {
             setHeader(res.headers.authorization)
             localStorage.setItem('token', res.headers.authorization)
-            return true
         }
-        return false
     },
     isAuthenticated() {
         return !!localStorage.getItem('token')
