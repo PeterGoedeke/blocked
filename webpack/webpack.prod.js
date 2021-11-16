@@ -2,7 +2,9 @@
 const path = require('path')
 const { merge } = require('webpack-merge')
 const common = require('./webpack.common')
+const dotenv = require('dotenv').config({ path: './.prod.env' })
 // const WebpackObfuscator = require('webpack-obfuscator')
+const webpack = require('webpack')
 
 const prod = {
     mode: 'production',
@@ -20,6 +22,9 @@ const prod = {
         }
     },
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env': JSON.stringify(dotenv.parsed)
+        })
         // disabled by default (uncomment to active)
         // new WebpackObfuscator(
         //   {
