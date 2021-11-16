@@ -78,5 +78,40 @@ export default {
         const res = await axios.get('users/me/levels')
 
         return sortLevelsToFolders(res.data.levels)
+    },
+    async saveLevel(level: Level) {
+        const input: LevelInDTO = {
+            gameLevel: level.gameLevel,
+            name: level.name,
+            folderName: level.folderName,
+            isPublic: level.isPublic,
+            index: level.index
+        }
+        const res = await axios.put(`levels/${level.id}`, input)
+        return res.status === 204
+    },
+    async createLevel(level: LevelInDTO): Promise<Level | null> {
+        const res = await axios.post('levels', level)
+        if (res.status === 201) {
+            return res.data as Level
+        }
+        return null
+    },
+    async deleteLevel(id: number) {
+        const res = await axios.delete(`levels/${id}`)
+        return res.status === 204
+    },
+    async getFeaturedLevels() {
+        const res = await axios.get('levels', {
+            params: {
+                featured: true
+            }
+        })
+
+        return sortLevelsToFolders(res.data.levels)
+    },
+
+    async logout() {
+        localStorage.removeItem('token')
     }
 }
