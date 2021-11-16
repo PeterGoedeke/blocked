@@ -9,7 +9,7 @@ export default class LoginForm extends Phaser.GameObjects.DOMElement {
         username: HTMLInputElement
         password: HTMLInputElement
         errorText: Element
-        submit: Element
+        submit: HTMLInputElement
         exit: Element
     }
 
@@ -24,7 +24,7 @@ export default class LoginForm extends Phaser.GameObjects.DOMElement {
             username: <HTMLInputElement>document.querySelector('.username'),
             password: <HTMLInputElement>document.querySelector('.password'),
             errorText: <Element>document.querySelector('.error'),
-            submit: <Element>document.querySelector('.submit'),
+            submit: <HTMLInputElement>document.querySelector('.submit'),
             exit: <Element>document.querySelector('.exit')
         }
     }
@@ -53,6 +53,7 @@ export default class LoginForm extends Phaser.GameObjects.DOMElement {
     setTitle(title: string) {
         this.title = title
         this.vh.title.textContent = this.title
+        this.vh.submit.value = this.title
     }
 
     popup(title: string, callback: Callback) {

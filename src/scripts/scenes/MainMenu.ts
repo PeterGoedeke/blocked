@@ -6,6 +6,7 @@ export default class MainMenuScene extends Phaser.Scene {
     levelScene!: Phaser.Scenes.ScenePlugin
     form!: LoginForm
     loginButton!: MenuItem
+    registerButton!: MenuItem
     username!: MenuItem
 
     constructor() {
@@ -27,17 +28,18 @@ export default class MainMenuScene extends Phaser.Scene {
         )
         this.username.setFontSize(32)
 
-        const levelSelectButton = new MenuItem(this, centreX, quarterY * 1.5, 'Level Select', true)
+        const levelSelectButton = new MenuItem(this, centreX, quarterY * 1.2, 'Level Select', true)
         const communityLevelsButton = new MenuItem(
             this,
             centreX,
-            quarterY * 2,
+            quarterY * 1.7,
             'Community Levels',
             true
         )
-        const levelEditorButton = new MenuItem(this, centreX, quarterY * 2.5, 'Level Editor', true)
-        this.loginButton = new MenuItem(this, centreX, quarterY * 3, 'Login', true)
-        const myLevelsButton = new MenuItem(this, centreX, quarterY * 3.5, 'My Levels', true)
+        const levelEditorButton = new MenuItem(this, centreX, quarterY * 2.2, 'Level Editor', true)
+        this.loginButton = new MenuItem(this, centreX, quarterY * 2.7, 'Login', true)
+        this.registerButton = new MenuItem(this, centreX, quarterY * 3.2, 'Register', true)
+        const myLevelsButton = new MenuItem(this, centreX, quarterY * 3.7, 'My Levels', true)
 
         this.children.add(title)
         this.children.add(this.username)
@@ -45,6 +47,7 @@ export default class MainMenuScene extends Phaser.Scene {
         this.children.add(communityLevelsButton)
         this.children.add(levelEditorButton)
         this.children.add(this.loginButton)
+        this.children.add(this.registerButton)
         this.children.add(myLevelsButton)
 
         levelSelectButton.on('pointerdown', () => {
@@ -61,6 +64,10 @@ export default class MainMenuScene extends Phaser.Scene {
 
         this.loginButton.on('pointerdown', () => {
             this.onLogin()
+        })
+
+        this.registerButton.on('pointerdown', () => {
+            this.onRegister()
         })
 
         myLevelsButton.on('pointerdown', () => {
@@ -117,6 +124,15 @@ export default class MainMenuScene extends Phaser.Scene {
             this.loginButton.setText('Login')
             this.username.setText('Not logged in')
         }
+    }
+
+    onRegister() {
+        this.form.popup('Register', async (user: User) => {
+            await client.register(user.username, user.password)
+            this.onAuthenticated()
+            this.scene.resume()
+        })
+        this.scene.pause()
     }
 
     onAuthenticated() {

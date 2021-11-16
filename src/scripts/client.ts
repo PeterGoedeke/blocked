@@ -52,6 +52,16 @@ export default {
             localStorage.setItem('token', res.headers.authorization)
         }
     },
+    async register(username: string, password: string) {
+        const res = await axios.post('users', {
+            username,
+            password
+        })
+        if (res.status === 201) {
+            setHeader(res.headers.authorization)
+            localStorage.setItem('token', res.headers.authorization)
+        }
+    },
     isAuthenticated() {
         return !!localStorage.getItem('token')
     },
