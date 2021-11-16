@@ -1,4 +1,3 @@
-import { getNextLevel } from '../objects/LevelManager'
 import MenuItem from '../objects/widgets/MenuItem'
 
 interface InitData {

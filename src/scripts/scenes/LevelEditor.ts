@@ -211,7 +211,7 @@ export default class LevelEditorScene extends Phaser.Scene {
             }
         })
 
-        this.form = new LevelForm(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
+        this.form = new LevelForm(this)
         this.children.add(this.form)
         this.form.setVisible(false)
 

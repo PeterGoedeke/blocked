@@ -11,10 +11,11 @@ export default class LevelForm extends Phaser.GameObjects.DOMElement {
         isPublic: HTMLInputElement
         index: HTMLInputElement
         submit: Element
+        exit: Element
     }
 
-    constructor(scene: Phaser.Scene, x: number | undefined, y: number | undefined) {
-        super(scene, x, y)
+    constructor(scene: Phaser.Scene) {
+        super(scene, scene.cameras.main.width / 2, scene.cameras.main.height / 3)
 
         this.createFromCache('levelform')
 
@@ -25,7 +26,8 @@ export default class LevelForm extends Phaser.GameObjects.DOMElement {
             folderName: <HTMLInputElement>document.querySelector('.folderName'),
             isPublic: <HTMLInputElement>document.querySelector('.isPublic'),
             index: <HTMLInputElement>document.querySelector('.index'),
-            submit: <Element>document.querySelector('.submit')
+            submit: <Element>document.querySelector('.submit'),
+            exit: <Element>document.querySelector('.exit')
         }
     }
 
@@ -44,6 +46,8 @@ export default class LevelForm extends Phaser.GameObjects.DOMElement {
                     console.log('Failed')
                 }
             }
+        } else if (event.target === this.vh.exit) {
+            this.setVisible(false)
         }
     }
 
