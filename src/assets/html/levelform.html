@@ -1,14 +1,15 @@
 <html>
 <style>
-    .login {
+    .form {
       background: #eceeee;
       border: 1px solid #42464b;
       border-radius: 6px;
-      height: 257px;
-      margin: 20px auto 0;
+      height: 367px;
+      margin: 100px auto 0;
       width: 298px;
+      padding-top: 10px;
     }
-    .login h1 {
+    .form h1 {
       background-image: linear-gradient(top, #f1f3f3, #d4dae0);
       border-bottom: 1px solid #a6abaf;
       border-radius: 6px 6px 0 0;
@@ -22,7 +23,7 @@
       text-align: center;
       text-shadow: 0 -1px 0 rgba(0,0,0,0.2), 0 1px 0 #fff;
     }
-    input[type="password"], input[type="text"] {
+    .input {
       background: linear-gradient(top, #d6d7d7, #dee0e0);
       border: 1px solid #a1a3a3;
       border-radius: 4px;
@@ -30,12 +31,13 @@
       box-sizing: border-box;
       color: #696969;
       height: 39px;
-      margin: 31px 0 0 29px;
+      margin: 10px 0 10px 29px;
       padding-left: 37px;
       transition: box-shadow 0.3s;
       width: 240px;
+      
     }
-    input[type="password"]:focus, input[type="text"]:focus {
+    .input:focus {
       box-shadow: 0 0 4px 1px rgba(55, 166, 155, 0.3);
       outline: 0;
     }
@@ -45,7 +47,7 @@
       margin: 26px 0 0 28px;
       width: 87px;
     }
-    input[type="checkbox"] {
+    /* input[type="checkbox"] {
       cursor: pointer;
       height: 16px;
       opacity: 0;
@@ -55,7 +57,7 @@
     input[type="checkbox"]:checked {
       left: 29px;
       width: 58px;
-    }
+    } */
     .toggle {
       display: block;
       height: 16px;
@@ -63,19 +65,8 @@
       width: 87px;
       z-index: -1;
     }
-    input[type="checkbox"]:checked + .toggle { background-position: 0 -16px }
-    .forgot {
-      color: #7f7f7f;
-      display: inline-block;
-      float: right;
-      font: 12px/1 sans-serif;
-      left: -19px;
-      position: relative;
-      text-decoration: none;
-      top: 5px;
-      transition: color .4s;
-    }
-    .forgot:hover { color: #3b3b3b }
+    /* input[type="checkbox"]:checked + .toggle { background-position: 0 -16px } */
+
     input[type="submit"] {
       width:240px;
       height:35px;
@@ -89,7 +80,7 @@
       text-align:center;
       text-shadow:1px 1px 0px #37a69b;
       padding-top:6px;
-      margin: 29px 0 0 29px;
+      margin: 0px 0 0 29px;
       position:relative;
       cursor:pointer;
       border: none;  
@@ -101,17 +92,43 @@
       border-bottom-left-radius:5px;
       box-shadow: inset 0px 1px 0px #2ab7ec, 0px 5px 0px 0px #497a78, 0px 10px 5px #999;
     }
-
+    
     input[type="submit"]:active {
       top:3px;
       box-shadow: inset 0px 1px 0px #2ab7ec, 0px 2px 0px 0px #31524d, 0px 5px 3px #999;
-    }    
+    }
+    .label {
+      margin-left: 37px;
+      display: block;
+      color: darkgrey;
+    }
+    .isPublic {
+      display: block;
+      margin-left: 29px;
+      margin-top: 5px;
+      margin-bottom: 5px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1.2em;
+      margin-left: 34px;
+      margin-bottom: 10px;
+      
+    }
+
     </style>
     
-    <div class="login">
-        <input type="text" placeholder="Username" id="username" name="username">
-        <input type="password" placeholder="password" id="password" name="password">
-        <a href="#" class="forgot">forgot password?</a>
-        <input type="submit" value="Sign In" name="loginButton">
+    <div class="form">
+      <p class="title">Title</p>
+      <label class="label" for="name">Level Name</label>
+      <input class="input name" type="text" placeholder="level name" name="name">
+      <label class="label" for="folderName">Stage Name</label>
+      <input class="input folderName" type="text" placeholder="stage name" name="folderName">
+      <label class="label" for="isPublic">Public Level?</label>
+      <input class="isPublic" type="checkbox" name="isPublic">
+      <label class="label" for="index">Sort Position</label>
+      <input class="input index" type="number" value="0" name="index">
+      <input class="submit" type="submit" value="Save" name="submit">
     </div>
 </html>

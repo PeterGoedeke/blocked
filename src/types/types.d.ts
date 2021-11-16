@@ -18,6 +18,14 @@ interface GameLevel {
     }[]
 }
 
+interface LevelInDTO {
+    gameLevel: GameLevel
+    name: string
+    folderName: string
+    isPublic: boolean
+    index: number
+}
+
 interface Level {
     /**
      * The id of the level
