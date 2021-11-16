@@ -1,5 +1,7 @@
+import client from '../client'
 import { getBlockData, getBlockList } from '../objects/BlockFactory'
 import { levelEditorToPhaser, phaserCoordinatesToLevelEditor } from '../objects/GridManager'
+import LevelForm from '../objects/widgets/LevelForm'
 import MenuItem from '../objects/widgets/MenuItem'
 
 export default class LevelEditorScene extends Phaser.Scene {
@@ -11,15 +13,19 @@ export default class LevelEditorScene extends Phaser.Scene {
 
     activeBlockImage!: Phaser.GameObjects.Image
     blocks: Phaser.GameObjects.Image[]
-    level: GameLevel
+    gameLevel: GameLevel
+    level: Level | undefined
     linking: boolean
     lines: Phaser.GameObjects.Line[]
     cellSize: number
     toolbarCellSize: number
+    form!: LevelForm
+    levelTitle!: Phaser.GameObjects.Text
 
-    init(data: GameLevel | undefined) {
-        if (data && data.blocks) {
-            this.level = data
+    init(level: Level | undefined) {
+        if (level && level.gameLevel) {
+            this.gameLevel = level.gameLevel
+            this.level = level
         }
     }
 
@@ -29,7 +35,7 @@ export default class LevelEditorScene extends Phaser.Scene {
         this.activeBlockData = getBlockList()[0]
         this.linking = false
 
-        this.level = {
+        this.gameLevel = {
             width: 21,
             height: 12,
             playerStart: {
@@ -54,8 +60,8 @@ export default class LevelEditorScene extends Phaser.Scene {
         const backgroundGrid = this.add.grid(
             0,
             0,
-            this.cellSize * this.level.width,
-            this.cellSize * this.level.height,
+            this.cellSize * this.gameLevel.width,
+            this.cellSize * this.gameLevel.height,
             this.cellSize,
             this.cellSize,
             undefined,
@@ -66,7 +72,7 @@ export default class LevelEditorScene extends Phaser.Scene {
         backgroundGrid.setOrigin(0, 0)
         backgroundGrid.setInteractive()
 
-        this.level.blocks.forEach(block =>
+        this.gameLevel.blocks.forEach(block =>
             this.addBlock(new Phaser.Math.Vector2(block.x, block.y), {
                 code: block.code,
                 ...getBlockData(block.code)
@@ -75,7 +81,29 @@ export default class LevelEditorScene extends Phaser.Scene {
         this.refreshLines()
 
         const backButton = new MenuItem(this, this.cameras.main.width - 40, 40, '<', true)
+        const saveButton = new MenuItem(this, 40, this.cameras.main.height - 20, 'Save', true)
+        const saveAsButton = new MenuItem(this, 150, this.cameras.main.height - 20, 'Save as', true)
+        const editButton = new MenuItem(this, 250, this.cameras.main.height - 20, 'Edit', true)
+        const playButton = new MenuItem(this, 325, this.cameras.main.height - 20, 'Play', true)
+        const deleteButton = new MenuItem(this, 420, this.cameras.main.height - 20, 'Delete', true)
+        console.log(this.level)
+        this.levelTitle = new MenuItem(
+            this,
+            800,
+            this.cameras.main.height - 20,
+            this.level?.name || 'Untitled'
+        )
+        ;[saveButton, saveAsButton, editButton, playButton, deleteButton, this.levelTitle].forEach(
+            button => button.setFontSize(32)
+        )
+
         this.children.add(backButton)
+        this.children.add(saveButton)
+        this.children.add(saveAsButton)
+        this.children.add(editButton)
+        this.children.add(playButton)
+        this.children.add(deleteButton)
+        this.children.add(this.levelTitle)
 
         const clearButton = new MenuItem(
             this,
@@ -92,15 +120,32 @@ export default class LevelEditorScene extends Phaser.Scene {
         })
 
         clearButton.on('pointerdown', () => {
-            this.level.blocks = []
-            this.blocks.forEach(block => block.destroy())
-            this.blocks = []
-            this.refreshLines()
+            this.onClear()
+        })
+
+        saveButton.on('pointerdown', () => {
+            this.onSave()
+        })
+
+        editButton.on('pointerdown', () => {
+            this.onEdit()
+        })
+
+        saveAsButton.on('pointerdown', () => {
+            this.onSaveAs()
+        })
+
+        playButton.on('pointerdown', () => {
+            this.onPlay()
+        })
+
+        deleteButton.on('pointerdown', () => {
+            this.onDelete()
         })
 
         const player = this.add.image(
-            this.cellSize * this.level.playerStart.x,
-            this.cellSize * this.level.playerStart.y,
+            this.cellSize * this.gameLevel.playerStart.x,
+            this.cellSize * this.gameLevel.playerStart.y,
             'player'
         )
         player.setOrigin(0, 0)
@@ -139,6 +184,9 @@ export default class LevelEditorScene extends Phaser.Scene {
         })
 
         backgroundGrid.on('pointerdown', (event: any) => {
+            if (this.form.visible) {
+                return
+            }
             const click = new Phaser.Math.Vector2(event.downX, event.downY)
             const gridLocation = phaserCoordinatesToLevelEditor(click, this.cellSize)
 
@@ -148,7 +196,7 @@ export default class LevelEditorScene extends Phaser.Scene {
                 texture: this.activeBlockData.texture
             }
 
-            this.level.blocks.push({
+            this.gameLevel.blocks.push({
                 x: gridLocation.x,
                 y: gridLocation.y,
                 code: blockData.code
@@ -162,6 +210,22 @@ export default class LevelEditorScene extends Phaser.Scene {
                 this.onMainMenu()
             }
         })
+
+        this.form = new LevelForm(this, this.cameras.main.width / 2, this.cameras.main.height / 2)
+        this.children.add(this.form)
+        this.form.setVisible(false)
+
+        this.form.addListener('click')
+        this.form.on('click', (e: any) => {
+            this.form.onClick(e)
+        })
+    }
+
+    onClear() {
+        this.gameLevel.blocks = []
+        this.blocks.forEach(block => block.destroy())
+        this.blocks = []
+        this.refreshLines()
     }
 
     addBlock(
@@ -190,24 +254,24 @@ export default class LevelEditorScene extends Phaser.Scene {
             } else {
                 block.destroy()
 
-                this.level.blocks.splice(
-                    this.level.blocks.findIndex(
+                this.gameLevel.blocks.splice(
+                    this.gameLevel.blocks.findIndex(
                         b => b.x === gridLocation.x && b.y === gridLocation.y
                     ),
                     1
                 )
             }
             this.refreshLines()
-            console.log(JSON.stringify(this.level))
-            this.copyTextToClipboard(JSON.stringify(this.level))
+            console.log(JSON.stringify(this.gameLevel))
+            this.copyTextToClipboard(JSON.stringify(this.gameLevel))
         })
 
-        console.log(JSON.stringify(this.level))
-        this.copyTextToClipboard(JSON.stringify(this.level))
+        console.log(JSON.stringify(this.gameLevel))
+        this.copyTextToClipboard(JSON.stringify(this.gameLevel))
     }
 
     getBlock(x: number, y: number) {
-        const block = this.level.blocks.find(b => b.x === x && b.y === y)
+        const block = this.gameLevel.blocks.find(b => b.x === x && b.y === y)
         if (!block) {
             throw Error(`Block not found at (${x}, ${y})`)
         }
@@ -218,12 +282,12 @@ export default class LevelEditorScene extends Phaser.Scene {
         this.lines.forEach(line => line.destroy())
         this.lines = []
 
-        for (let i = 0; i < this.level.blocks.length; i++) {
-            const block = this.level.blocks[i]
+        for (let i = 0; i < this.gameLevel.blocks.length; i++) {
+            const block = this.gameLevel.blocks[i]
 
             if (block.linkCode !== undefined) {
-                for (let j = i + 1; j < this.level.blocks.length; j++) {
-                    const linkBlock = this.level.blocks[j]
+                for (let j = i + 1; j < this.gameLevel.blocks.length; j++) {
+                    const linkBlock = this.gameLevel.blocks[j]
 
                     if (block.linkCode === linkBlock.linkCode) {
                         const line = this.add.line(
@@ -271,6 +335,7 @@ export default class LevelEditorScene extends Phaser.Scene {
 
         document.body.removeChild(textArea)
     }
+
     copyTextToClipboard(text: string) {
         if (!navigator.clipboard) {
             this.fallbackCopyTextToClipboard(text)
@@ -284,5 +349,78 @@ export default class LevelEditorScene extends Phaser.Scene {
                 console.error('Async: Could not copy text: ', err)
             }
         )
+    }
+
+    levelBelongsToUser(level: Level | undefined): level is Level {
+        return (
+            !!level &&
+            client.isAuthenticated() &&
+            level.authorName === client.getAuthenticatedUsername()
+        )
+    }
+
+    async onSave() {
+        if (this.levelBelongsToUser(this.level)) {
+            console.log(await client.saveLevel(this.level))
+        }
+    }
+
+    async onDelete() {
+        if (this.levelBelongsToUser(this.level)) {
+            await client.deleteLevel(this.level.id)
+            this.onClear()
+            this.level = undefined
+            this.setLevelName()
+            this.scene.start('LevelEditorScene', {})
+        }
+    }
+
+    onEdit() {
+        if (this.levelBelongsToUser(this.level)) {
+            this.form.popup('Edit', async level => {
+                if (this.level) {
+                    this.level.folderName = level.folderName
+                    this.level.name = level.name
+                    this.level.index = level.index
+                    this.level.isPublic = level.isPublic
+
+                    this.setLevelName(this.level.name)
+                    return await client.saveLevel(this.level)
+                }
+                return false
+            })
+        }
+    }
+
+    setLevelName(name?: string) {
+        this.levelTitle.setText(name || 'Untitled')
+    }
+
+    onSaveAs() {
+        if (client.isAuthenticated()) {
+            this.form.popup('Save as', async level => {
+                const newLevel: LevelInDTO = {
+                    folderName: level.folderName,
+                    gameLevel: this.gameLevel,
+                    index: level.index,
+                    isPublic: level.isPublic,
+                    name: level.name
+                }
+                const result = await client.createLevel(newLevel)
+                if (result) {
+                    this.level = result
+                    this.gameLevel = result.gameLevel
+                    this.setLevelName(this.level.name)
+                }
+                return !!result
+            })
+        }
+    }
+
+    onPlay() {
+        this.scene.start('LevelScene', {
+            gameLevel: this.gameLevel,
+            isLevelEditor: true
+        })
     }
 }

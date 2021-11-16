@@ -20,6 +20,7 @@ export default class LevelScene extends Phaser.Scene {
 
     blockFactory: BlockFactory
     links: Links
+    isLevelEditor!: boolean
 
     constructor() {
         super({ key: 'LevelScene' })
@@ -30,9 +31,10 @@ export default class LevelScene extends Phaser.Scene {
         this.active = true
     }
 
-    async init(data: GameLevel) {
-        this.level = data
+    async init(data: { gameLevel: GameLevel; isLevelEditor?: boolean }) {
+        this.level = data.gameLevel
         this.active = true
+        this.isLevelEditor = data.isLevelEditor || false
     }
 
     addBlock(type: string, gridX: number, gridY: number) {
@@ -158,13 +160,23 @@ export default class LevelScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                this.scene.launch('MenuOverlayScene', {
-                    wonLevel: false,
-                    levelScene: this.scene
-                })
-                this.scene.pause()
+                this.onMenu()
             }
         })
+    }
+
+    onMenu(wonLevel = false) {
+        if (!this.isLevelEditor) {
+            this.scene.launch('MenuOverlayScene', {
+                wonLevel,
+                levelScene: this.scene
+            })
+            if (!wonLevel) {
+                this.scene.pause()
+            }
+        } else {
+            this.scene.start('LevelEditorScene')
+        }
     }
 
     update() {

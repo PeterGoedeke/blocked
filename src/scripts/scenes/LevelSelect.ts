@@ -119,13 +119,12 @@ export default class LevelSelectScene extends Phaser.Scene {
     onSelect(index: number) {
         this.currentIndex = index
         if (index < this.folder.levels.length) {
-            this.scene.launch(
-                this.editMode ? 'LevelEditorScene' : 'LevelScene',
-                this.folder.levels[index].gameLevel
-            )
             if (this.editMode) {
-                this.scene.stop()
+                this.scene.start('LevelEditorScene', this.folder.levels[index])
             } else {
+                this.scene.launch('LevelScene', {
+                    gameLevel: this.folder.levels[index].gameLevel
+                })
                 this.scene.sleep()
             }
         }
