@@ -377,18 +377,22 @@ export default class LevelEditorScene extends Phaser.Scene {
 
     onEdit() {
         if (this.levelBelongsToUser(this.level)) {
-            this.form.popup('Edit', async level => {
-                if (this.level) {
-                    this.level.folderName = level.folderName
-                    this.level.name = level.name
-                    this.level.index = level.index
-                    this.level.isPublic = level.isPublic
+            this.form.popup(
+                'Edit',
+                async level => {
+                    if (this.level) {
+                        this.level.folderName = level.folderName
+                        this.level.name = level.name
+                        this.level.index = level.index
+                        this.level.isPublic = level.isPublic
 
-                    this.setLevelName(this.level.name)
-                    return await client.saveLevel(this.level)
-                }
-                return false
-            })
+                        this.setLevelName(this.level.name)
+                        return await client.saveLevel(this.level)
+                    }
+                    return false
+                },
+                this.level
+            )
         }
     }
 
@@ -398,22 +402,26 @@ export default class LevelEditorScene extends Phaser.Scene {
 
     onSaveAs() {
         if (client.isAuthenticated()) {
-            this.form.popup('Save as', async level => {
-                const newLevel: LevelInDTO = {
-                    folderName: level.folderName,
-                    gameLevel: this.gameLevel,
-                    index: level.index,
-                    isPublic: level.isPublic,
-                    name: level.name
-                }
-                const result = await client.createLevel(newLevel)
-                if (result) {
-                    this.level = result
-                    this.gameLevel = result.gameLevel
-                    this.setLevelName(this.level.name)
-                }
-                return !!result
-            })
+            this.form.popup(
+                'Save as',
+                async level => {
+                    const newLevel: LevelInDTO = {
+                        folderName: level.folderName,
+                        gameLevel: this.gameLevel,
+                        index: level.index,
+                        isPublic: level.isPublic,
+                        name: level.name
+                    }
+                    const result = await client.createLevel(newLevel)
+                    if (result) {
+                        this.level = result
+                        this.gameLevel = result.gameLevel
+                        this.setLevelName(this.level.name)
+                    }
+                    return !!result
+                },
+                this.level
+            )
         }
     }
 

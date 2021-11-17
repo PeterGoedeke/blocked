@@ -37,7 +37,7 @@ export default class LevelForm extends Phaser.GameObjects.DOMElement {
                 const result = await this.callback({
                     folderName: this.vh.folderName.value,
                     index: Number(this.vh.index.value),
-                    isPublic: this.vh.isPublic.value === 'on',
+                    isPublic: this.vh.isPublic.checked,
                     name: this.vh.name.value
                 })
                 if (result) {
@@ -56,9 +56,15 @@ export default class LevelForm extends Phaser.GameObjects.DOMElement {
         this.vh.title.textContent = this.title
     }
 
-    popup(title: string, callback: Callback) {
+    popup(title: string, callback: Callback, level?: Level) {
         this.setTitle(title)
         this.callback = callback
         this.setVisible(true)
+        if (level) {
+            this.vh.name.value = level.name
+            this.vh.folderName.value = level.folderName
+            this.vh.isPublic.checked = level.isPublic
+            this.vh.index.value = level.index.toString()
+        }
     }
 }
