@@ -91,6 +91,7 @@ export default class MenuOverlayScene extends Phaser.Scene {
     }
 
     onMainMenu() {
+        this.scene.stop('LevelSelectScene')
         this.scene.start('MainMenuScene')
         this.levelScene.stop()
     }
