@@ -68,11 +68,12 @@ const blockData: BlockData = {
         strategy: KillStrategy
     },
     h: {
-        tint: 0x734172,
-        strategy: DoorStrategy
+        tint: 0xffffff,
+        strategy: DoorStrategy,
+        texture: 'lock'
     },
     i: {
-        tint: 0xc5eb94,
+        tint: 0xffffff,
         strategy: KeyStrategy,
         texture: 'key'
     },

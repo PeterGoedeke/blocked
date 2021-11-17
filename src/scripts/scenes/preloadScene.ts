@@ -14,6 +14,8 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('block', 'assets/img/block.png')
         this.load.image('cloud', 'assets/img/cloud.png')
         this.load.image('key', 'assets/img/key.png')
+        this.load.image('lock', 'assets/img/lock.png')
+        this.load.image('lock-open', 'assets/img/lock-open.png')
         this.load.image('backdrop', 'assets/img/backdrop.png')
 
         this.load.html('form', 'assets/html/loginform.html')
