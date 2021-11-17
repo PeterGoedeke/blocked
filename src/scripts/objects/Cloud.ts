@@ -42,7 +42,7 @@ export default class Cloud extends Phaser.Physics.Arcade.Sprite {
 
         this.setX(
             this.randomIntFromInterval(
-                this.scene.cameras.main.width,
+                this.scene.cameras.main.width + this.width * 1.5,
                 this.scene.cameras.main.width * 2
             )
         )
