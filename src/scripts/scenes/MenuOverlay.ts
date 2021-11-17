@@ -73,7 +73,7 @@ export default class MenuOverlayScene extends Phaser.Scene {
     }
 
     async onNextLevel() {
-        this.scene.wake('LevelSelectScene')
+        this.scene.wake('LevelSelectScene', { next: true })
         this.scene.stop()
         this.levelScene.stop()
     }
@@ -85,7 +85,8 @@ export default class MenuOverlayScene extends Phaser.Scene {
     }
 
     onLevelSelect() {
-        this.scene.start('LevelSelectScene')
+        this.scene.wake('LevelSelectScene', { next: false })
+        this.scene.stop()
         this.levelScene.stop()
     }
 

@@ -109,8 +109,8 @@ export default class LevelSelectScene extends Phaser.Scene {
         this.refreshSelectPage()
 
         this.events.removeAllListeners(Phaser.Scenes.Events.WAKE)
-        this.events.on(Phaser.Scenes.Events.WAKE, () => {
-            if (this.currentIndex !== undefined) {
+        this.events.on(Phaser.Scenes.Events.WAKE, (a: any, data: { next: boolean }) => {
+            if (data.next && this.currentIndex !== undefined) {
                 this.onSelect(this.currentIndex + 1)
             }
         })
