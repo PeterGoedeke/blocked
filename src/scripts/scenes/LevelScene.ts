@@ -20,6 +20,7 @@ export default class LevelScene extends Phaser.Scene {
     blockFactory: BlockFactory
     links: Links
     isLevelEditor!: boolean
+    killBlock?: { x: number; y: number }
 
     constructor() {
         super({ key: 'LevelScene' })
@@ -49,8 +50,13 @@ export default class LevelScene extends Phaser.Scene {
         } else {
             this.blocks.add(block)
         }
+        block.body.setSize(cellSize, cellSize)
 
         return block
+    }
+
+    setKiller(x: number, y: number) {
+        this.killBlock = { x, y }
     }
 
     checkFallOutOfWorld() {
@@ -99,6 +105,26 @@ export default class LevelScene extends Phaser.Scene {
 
         this.level.blocks.forEach(blockRaw => {
             const block = this.addBlock(blockRaw.code, blockRaw.x, blockRaw.y)
+            if (blockRaw.x === this.killBlock?.x && blockRaw.y === this.killBlock.y) {
+                if (!block.hasTween) {
+                    block.scene.tweens.add({
+                        targets: block,
+                        scaleX: 0.3,
+                        scaleY: 0.3,
+                        alpha: 0.5,
+                        duration: 100,
+                        ease: 'Power2',
+                        yoyo: true
+                    })
+                    block.scene.tweens.add({
+                        targets: block,
+                        duration: 200,
+                        angle: 180,
+                        ease: Phaser.Math.Easing.Linear
+                    })
+                }
+                this.killBlock = undefined
+            }
 
             if (blockRaw.linkCode !== undefined) {
                 if (!this.links[blockRaw.linkCode]) {
