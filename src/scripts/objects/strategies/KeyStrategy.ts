@@ -2,6 +2,7 @@ import BlockStrategy from './BlockStrategy'
 import Player from '../Player'
 import DoorStrategy from './DoorStrategy'
 import Block from '../Block'
+import { cellSize } from '../GridManager'
 
 export default class KeyStrategy extends BlockStrategy {
     door?: DoorStrategy
@@ -11,14 +12,15 @@ export default class KeyStrategy extends BlockStrategy {
 
         this.block.scene.tweens.add({
             targets: this.block,
-            scaleX: 0.65,
-            scaleY: 0.65,
+            scaleX: 0.58,
+            scaleY: 0.58,
             alpha: 1,
             ease: Phaser.Math.Easing.Sine.InOut,
             repeat: -1,
             yoyo: true,
             duration: 800
         })
+        this.block.setDisplaySize(cellSize * 0.8, cellSize * 0.8)
     }
 
     handle(player: Player) {

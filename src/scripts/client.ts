@@ -118,6 +118,10 @@ export default {
 
         return sortLevelsToFolders(res.data.levels)
     },
+    async getLevelById(id: number) {
+        const res = await axios.get(`levels/${id}`)
+        return res.data as Level
+    },
 
     async logout() {
         localStorage.removeItem('token')

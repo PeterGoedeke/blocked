@@ -20,6 +20,7 @@ export default class LevelScene extends Phaser.Scene {
     blockFactory: BlockFactory
     links: Links
     isLevelEditor!: boolean
+    fromLink!: boolean
     killBlock?: { x: number; y: number }
 
     constructor() {
@@ -31,10 +32,11 @@ export default class LevelScene extends Phaser.Scene {
         this.active = true
     }
 
-    async init(data: { gameLevel: GameLevel; isLevelEditor?: boolean }) {
+    async init(data: { gameLevel: GameLevel; isLevelEditor?: boolean; fromLink?: boolean }) {
         this.level = data.gameLevel
         this.active = true
         this.isLevelEditor = data.isLevelEditor || false
+        this.fromLink = data.fromLink || false
     }
 
     addBlock(type: string, gridX: number, gridY: number) {
@@ -191,16 +193,21 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     onMenu(wonLevel = false) {
-        if (!this.isLevelEditor) {
-            this.scene.launch('MenuOverlayScene', {
-                wonLevel,
-                levelScene: this.scene
-            })
-            if (!wonLevel) {
-                this.scene.pause()
-            }
-        } else {
+        if (this.isLevelEditor) {
             this.scene.start('LevelEditorScene')
+        } else if (this.fromLink) {
+            this.scene.start('MainMenuScene')
+            history.pushState('', document.title, window.location.pathname + window.location.search)
+        } else {
+            if (!this.isLevelEditor) {
+                this.scene.launch('MenuOverlayScene', {
+                    wonLevel,
+                    levelScene: this.scene
+                })
+                if (!wonLevel) {
+                    this.scene.pause()
+                }
+            }
         }
     }
 

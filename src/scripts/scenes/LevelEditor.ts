@@ -86,16 +86,23 @@ export default class LevelEditorScene extends Phaser.Scene {
         const editButton = new MenuItem(this, 250, this.cameras.main.height - 20, 'Edit', true)
         const playButton = new MenuItem(this, 325, this.cameras.main.height - 20, 'Play', true)
         const deleteButton = new MenuItem(this, 420, this.cameras.main.height - 20, 'Delete', true)
-        console.log(this.level)
+        const shareButton = new MenuItem(this, 530, this.cameras.main.height - 20, 'Share', true)
+
         this.levelTitle = new MenuItem(
             this,
-            800,
+            1000,
             this.cameras.main.height - 20,
             this.level?.name || 'Untitled'
         )
-        ;[saveButton, saveAsButton, editButton, playButton, deleteButton, this.levelTitle].forEach(
-            button => button.setFontSize(32)
-        )
+        ;[
+            saveButton,
+            saveAsButton,
+            editButton,
+            playButton,
+            deleteButton,
+            this.levelTitle,
+            shareButton
+        ].forEach(button => button.setFontSize(32))
 
         this.children.add(backButton)
         this.children.add(saveButton)
@@ -103,6 +110,7 @@ export default class LevelEditorScene extends Phaser.Scene {
         this.children.add(editButton)
         this.children.add(playButton)
         this.children.add(deleteButton)
+        this.children.add(shareButton)
         this.children.add(this.levelTitle)
 
         const clearButton = new MenuItem(
@@ -141,6 +149,10 @@ export default class LevelEditorScene extends Phaser.Scene {
 
         deleteButton.on('pointerdown', () => {
             this.onDelete()
+        })
+
+        shareButton.on('pointerdown', () => {
+            this.onShare()
         })
 
         const player = this.add.image(
@@ -243,6 +255,10 @@ export default class LevelEditorScene extends Phaser.Scene {
         this.blocks.push(block)
 
         block.on('pointerdown', () => {
+            if (this.form.visible) {
+                return
+            }
+
             if (this.linking) {
                 const linkBlock = this.getBlock(gridLocation.x, gridLocation.y)
 
@@ -265,9 +281,12 @@ export default class LevelEditorScene extends Phaser.Scene {
             console.log(JSON.stringify(this.gameLevel))
             this.copyTextToClipboard(JSON.stringify(this.gameLevel))
         })
+    }
 
-        console.log(JSON.stringify(this.gameLevel))
-        this.copyTextToClipboard(JSON.stringify(this.gameLevel))
+    onShare() {
+        if (this.level) {
+            this.copyTextToClipboard(window.location.origin + '/#' + this.level.id)
+        }
     }
 
     getBlock(x: number, y: number) {
@@ -418,6 +437,8 @@ export default class LevelEditorScene extends Phaser.Scene {
                         this.gameLevel = result.gameLevel
                         this.setLevelName(this.level.name)
                     }
+                    this.scene.start('LevelEditorScene', this.level)
+
                     return !!result
                 },
                 this.level

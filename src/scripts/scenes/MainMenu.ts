@@ -14,6 +14,11 @@ export default class MainMenuScene extends Phaser.Scene {
     }
 
     async create() {
+        if (window.location.hash && window.location.hash !== '#') {
+            const level = await client.getLevelById(Number(window.location.hash.slice(1)))
+            this.scene.start('LevelScene', { gameLevel: level.gameLevel, fromLink: true })
+        }
+
         const centreX = this.cameras.main.worldView.x + this.cameras.main.width / 2
         const quarterY = this.cameras.main.worldView.y + this.cameras.main.height / 4
 
