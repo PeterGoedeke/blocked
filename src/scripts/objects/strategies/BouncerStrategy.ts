@@ -7,6 +7,7 @@ export default class BouncerStrategy extends BlockStrategy {
         const d = this.gridCoordinates.subtract(player.gridCoordinates)
         d.rotate(-Math.PI / 2)
         player.setGridDirection(new Phaser.Math.Vector2(Math.round(d.x), Math.round(d.y)))
+        this.block.scene.checkFallOutOfWorld()
 
         setTimeout(() => {
             player.setX(Math.floor(player.x / cellSize) * cellSize + cellSize / 2)

@@ -3,6 +3,7 @@ import Player from '../Player'
 
 export default class PlatformStrategy extends BlockStrategy {
     handle(player: Player) {
+        const checkFallOutOfWorld = this.block.scene.checkFallOutOfWorld.bind(this.block.scene)
         setTimeout(() => {
             this.block.destroy()
             // this.block.body.destroy()
@@ -14,6 +15,7 @@ export default class PlatformStrategy extends BlockStrategy {
             if (player.resting) {
                 const d = coords.subtract(player.gridCoordinates)
                 player.setGridDirection(d)
+                checkFallOutOfWorld()
             }
         }, 300)
 
