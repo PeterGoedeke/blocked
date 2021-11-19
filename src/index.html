@@ -1,63 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-    <meta name="theme-color" content="#000000" />
+        <meta name="theme-color" content="#000000" />
 
-    <link rel="manifest" href="./manifest.json" />
+        <link rel="manifest" href="./manifest.json" />
 
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="application-name" content="<%= htmlWebpackPlugin.options.gameName %>" />
-    <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.gameName %>" />
-    <meta name="msapplication-starturl" content="./" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="<%= htmlWebpackPlugin.options.gameName %>" />
+        <meta
+            name="apple-mobile-web-app-title"
+            content="<%= htmlWebpackPlugin.options.gameName %>"
+        />
+        <meta name="msapplication-starturl" content="./" />
 
-    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
-    <link rel="apple-touch-icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="./icons/icons-192.png" />
+        <link
+            rel="apple-touch-icon"
+            type="image/png"
+            sizes="192x192"
+            href="./icons/icons-192.png"
+        />
 
-    <link rel="icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
-    <link rel="apple-touch-icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="./icons/icons-512.png" />
+        <link
+            rel="apple-touch-icon"
+            type="image/png"
+            sizes="512x512"
+            href="./icons/icons-512.png"
+        />
 
-    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon" />
 
-    <title><%= htmlWebpackPlugin.options.gameName %></title>
-    <style>
-      html,
-      body {
-        height: 100%;
-        margin: 0;
-        background-color: #000000;
-      }
+        <title><%= htmlWebpackPlugin.options.gameName %></title>
 
-      @font-face {
-        font-family: 'Roboto';
-        src: 
-            url('./assets/fonts/Roboto-Bold.ttf') format("truetype");
-        font-weight: bold;
-        font-style: normal;
-      }
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y97HCNZN6V"></script>
+        <script>
+            window.dataLayer = window.dataLayer || []
+            function gtag() {
+                dataLayer.push(arguments)
+            }
+            gtag('js', new Date())
 
-      body { font-family: 'Roboto'; }
-    </style>
+            gtag('config', 'G-Y97HCNZN6V')
+        </script>
+        <style>
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                background-color: #000000;
+            }
 
-    <noscript>Please enable javascript to continue using this application.</noscript>
+            @font-face {
+                font-family: 'Roboto';
+                src: url('./assets/fonts/Roboto-Bold.ttf') format('truetype');
+                font-weight: bold;
+                font-style: normal;
+            }
 
-    <!-- installs the serviceWorker -->
-    <!-- <script>
+            body {
+                font-family: 'Roboto';
+            }
+        </style>
+
+        <noscript>Please enable javascript to continue using this application.</noscript>
+
+        <!-- installs the serviceWorker -->
+        <!-- <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
         })
       }
     </script> -->
-  </head>
-  <body>
-    <div id="phaser-game"></div>
-  </body>
+    </head>
+    <body>
+        <div id="phaser-game"></div>
+    </body>
 </html>
