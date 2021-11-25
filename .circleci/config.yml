@@ -27,7 +27,6 @@ jobs:
       - attach_workspace:
           at: .
       - aws-s3/sync:
-          context: aws-creds
           from: dist
           to: 's3://blocked-game'
 
@@ -35,8 +34,7 @@ jobs:
     docker:
       - image: 'cimg/python:3.6'
     steps:
-      - aws-cli/setup:
-          context: aws-creds
+      - aws-cli/setup
       - run:
           name: Invalidate Cloudfront distribution
           command: |
@@ -52,8 +50,10 @@ workflows:
               only:
                 - main
       - deploy:
+          context: aws-creds
           requires:
             - build
       - invalidate:
+          context: aws-creds
           requires:
             - deploy
