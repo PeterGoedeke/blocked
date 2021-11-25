@@ -1,6 +1,15 @@
+type Vector = Phaser.Math.Vector2
+
 type Folder = {
     folderName: string
     levels: Level[]
+}
+
+interface BlockData {
+    x: number
+    y: number
+    code: string
+    linkCode?: number
 }
 
 interface GameLevel {
@@ -10,12 +19,7 @@ interface GameLevel {
         x: number
         y: number
     }
-    blocks: {
-        x: number
-        y: number
-        code: string
-        linkCode?: number
-    }[]
+    blocks: BlockData[]
 }
 
 interface LevelInDTO {
