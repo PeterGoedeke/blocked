@@ -1,6 +1,5 @@
 import BlockStrategy from './BlockStrategy'
 import Player from '../Player'
-import { cellSize } from '../GridManager'
 
 export default class BouncerStrategy extends BlockStrategy {
     handle(player: Player) {
@@ -25,8 +24,8 @@ export default class BouncerStrategy extends BlockStrategy {
         if (!this.block.hasTween) {
             this.block.scene.tweens.add({
                 targets: this.block,
-                scaleX: 0.7,
-                scaleY: 0.7,
+                scaleX: '*=1.2',
+                scaleY: '*=1.2',
                 duration: 70,
                 ease: 'Power2',
                 yoyo: true

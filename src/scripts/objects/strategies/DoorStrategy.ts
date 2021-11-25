@@ -11,8 +11,8 @@ export default class DoorStrategy extends BlockStrategy {
         this.block.setTexture('lock-open')
         this.block.scene.tweens.add({
             targets: this.block,
-            scaleX: 0.65,
-            scaleY: 0.65,
+            scaleX: '*=1.05',
+            scaleY: '*=1.05',
             duration: 100,
             ease: 'Power2',
             yoyo: true

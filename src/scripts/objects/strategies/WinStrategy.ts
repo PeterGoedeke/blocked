@@ -6,8 +6,8 @@ export default class WinStrategy extends BlockStrategy {
     handle(player: Player) {
         this.block.scene.tweens.add({
             targets: this.block,
-            scaleX: 0.7,
-            scaleY: 0.7,
+            scaleX: '*=1.2',
+            scaleY: '*=1.2',
             duration: 70,
             ease: 'Power2',
             yoyo: true

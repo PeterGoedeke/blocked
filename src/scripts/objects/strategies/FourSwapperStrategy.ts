@@ -10,8 +10,8 @@ export default class FourSwapperStrategy extends BlockStrategy {
         if (!this.block.hasTween) {
             this.block.scene.tweens.add({
                 targets: this.block,
-                scaleX: 0.65,
-                scaleY: 0.65,
+                scaleX: '*=1.1',
+                scaleY: '*=1.1',
                 alpha: 0.8,
                 duration: 100,
                 ease: 'Power2',
