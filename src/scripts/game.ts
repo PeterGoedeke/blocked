@@ -9,10 +9,12 @@ import MainMenuScene from './scenes/MainMenu'
 import MenuOverlayScene from './scenes/MenuOverlay'
 import PreloadScene from './scenes/preloadScene'
 
+import SwipePlugin from 'phaser3-swipe-plugin'
+
 const DEFAULT_WIDTH = 1260
 const DEFAULT_HEIGHT = 720
 
-const config = {
+const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     backgroundColor: '#bdfbff',
     scale: {
@@ -41,6 +43,18 @@ const config = {
         arcade: {
             debug: false
         }
+    },
+    plugins: {
+        global: [
+            {
+                key: 'SwipePlugin',
+                plugin: SwipePlugin,
+                start: true,
+                data: {
+                    offset: 10
+                }
+            }
+        ]
     }
 }
 

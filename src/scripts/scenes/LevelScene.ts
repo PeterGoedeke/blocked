@@ -160,32 +160,45 @@ export default class LevelScene extends Phaser.Scene {
 
         const cursors = this.input.keyboard.createCursorKeys()
 
-        cursors.left.addListener('down', () => {
-            if (this.player.resting && this.active) {
-                this.player.setGridDirection(new Phaser.Math.Vector2(-1, 0))
-                this.checkFallOutOfWorld()
+        const model = {
+            left: () => {
+                if (this.player.resting && this.active) {
+                    this.player.setGridDirection(new Phaser.Math.Vector2(-1, 0))
+                    this.checkFallOutOfWorld()
+                }
+            },
+            right: () => {
+                if (this.player.resting && this.active) {
+                    this.player.setGridDirection(new Phaser.Math.Vector2(1, 0))
+                    this.checkFallOutOfWorld()
+                }
+            },
+            up: () => {
+                if (this.player.resting && this.active) {
+                    this.player.setGridDirection(new Phaser.Math.Vector2(0, -1))
+                    this.checkFallOutOfWorld()
+                }
+            },
+            down: () => {
+                if (this.player.resting && this.active) {
+                    this.player.setGridDirection(new Phaser.Math.Vector2(0, 1))
+                    this.checkFallOutOfWorld()
+                }
             }
-        })
-        cursors.right.addListener('down', () => {
-            if (this.player.resting && this.active) {
-                this.player.setGridDirection(new Phaser.Math.Vector2(1, 0))
-                this.checkFallOutOfWorld()
-            }
-        })
-        cursors.up.addListener('down', () => {
-            if (this.player.resting && this.active) {
-                this.player.setGridDirection(new Phaser.Math.Vector2(0, -1))
-                this.checkFallOutOfWorld()
-            }
-        })
-        cursors.down.addListener('down', () => {
-            if (this.player.resting && this.active) {
-                this.player.setGridDirection(new Phaser.Math.Vector2(0, 1))
-                this.checkFallOutOfWorld()
-            }
+        }
+
+        this.game.events.removeAllListeners('swipe')
+        this.game.events.on('swipe', (dir: 'up' | 'left' | 'right' | 'down') => {
+            model[dir]()
         })
 
+        cursors.left.addListener('down', model.left)
+        cursors.right.addListener('down', model.right)
+        cursors.up.addListener('down', model.up)
+        cursors.down.addListener('down', model.down)
+
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
+            model['down']()
             if (event.key === 'Escape') {
                 this.onMenu()
             }
