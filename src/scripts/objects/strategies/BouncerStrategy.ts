@@ -9,9 +9,17 @@ export default class BouncerStrategy extends BlockStrategy {
         player.setGridDirection(new Phaser.Math.Vector2(Math.round(d.x), Math.round(d.y)))
         this.block.scene.checkFallOutOfWorld()
 
+        const gm = this.block.scene.gridManager
         setTimeout(() => {
-            player.setX(Math.floor(player.x / cellSize) * cellSize + cellSize / 2)
-            player.setY(Math.floor(player.y / cellSize) * cellSize + cellSize / 2)
+            const { x, y } = gm.gridToPhaser(
+                gm.phaserToGrid(
+                    new Phaser.Math.Vector2(player.body.position.x, player.body.position.y)
+                )
+            )
+            player.setX(x)
+            player.setY(y)
+            // player.setX(Math.floor(player.x / cellSize) * cellSize + cellSize / 2)
+            // player.setY(Math.floor(player.y / cellSize) * cellSize + cellSize / 2)
         }, 0)
 
         if (!this.block.hasTween) {
