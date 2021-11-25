@@ -23,7 +23,9 @@ const prod = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            'process.env': JSON.stringify(dotenv.parsed)
+            'process.env': JSON.stringify({
+                serverURL: process.env.serverURL
+            })
         })
         // disabled by default (uncomment to active)
         // new WebpackObfuscator(
