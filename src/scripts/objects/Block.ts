@@ -1,5 +1,4 @@
 import BlockStrategy from './strategies/BlockStrategy'
-import { cellSize, phaserCoordinatesToGrid } from './GridManager'
 import Player from './Player'
 import LevelScene from '../scenes/LevelScene'
 
@@ -13,7 +12,6 @@ export default class Block extends Phaser.Physics.Arcade.Image {
         this.scene = scene
         scene.add.existing(this)
 
-        this.setDisplaySize(cellSize, cellSize)
         this.setTint(tint)
     }
 
@@ -35,6 +33,8 @@ export default class Block extends Phaser.Physics.Arcade.Image {
     }
 
     get gridCoordinates() {
-        return phaserCoordinatesToGrid(this.body.position)
+        // console.log('awoooooo', this.scene.gridManager.phaserToGrid(this.body.position))
+        return this.scene.gridManager.phaserToGrid(this.body.position)
+        // return phaserCoordinatesToGrid(this.body.position)
     }
 }

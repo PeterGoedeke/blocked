@@ -1,19 +1,21 @@
-import { cellSize, gridCoordinatesToPhaser, phaserCoordinatesToGrid } from './GridManager'
+import LevelScene from '../scenes/LevelScene'
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     speed: number
     timeout?: number
+    scene: LevelScene
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(scene: LevelScene, x: number, y: number) {
         super(scene, x, y, 'player')
+
+        this.scene = scene
 
         this.play('player-anim')
         scene.add.existing(this)
         scene.physics.add.existing(this)
         this.setCollideWorldBounds(true)
 
-        this.setDisplaySize(cellSize, cellSize)
-        this.speed = 600
+        this.speed = this.scene.gridManager.cellSize * 10
     }
 
     get resting() {
@@ -21,12 +23,12 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     get gridCoordinates() {
-        return phaserCoordinatesToGrid(this.body.position)
+        return this.scene.gridManager.phaserToGrid(this.body.position)
     }
 
     setGridPosition(vec: Phaser.Math.Vector2) {
         this.setVelocity(0, 0)
-        const v = gridCoordinatesToPhaser(vec)
+        const v = this.scene.gridManager.gridToPhaser(vec)
         // console.log(vec)
         setTimeout(() => {
             this.setPosition(Math.round(v.x), Math.round(v.y))
