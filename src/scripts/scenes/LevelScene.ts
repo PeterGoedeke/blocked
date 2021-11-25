@@ -1,11 +1,17 @@
 import Block from '../objects/Block'
 import BlockFactory, { isPickup } from '../objects/BlockFactory'
-import { cellSize } from '../objects/GridManager'
+import GridManager from '../objects/GridManager'
 import Player from '../objects/Player'
 import BlockStrategy from '../objects/strategies/BlockStrategy'
+import Solver from '../Solver'
 
 interface Links {
     [key: string]: BlockStrategy[]
+}
+
+interface Bounds {
+    width: number
+    height: number
 }
 
 export default class LevelScene extends Phaser.Scene {
@@ -23,6 +29,11 @@ export default class LevelScene extends Phaser.Scene {
     fromLink!: boolean
     killBlock?: { x: number; y: number }
 
+    gridManager!: GridManager
+    resizeables: Block[]
+
+    timeout: number | undefined
+
     constructor() {
         super({ key: 'LevelScene' })
 
@@ -30,6 +41,7 @@ export default class LevelScene extends Phaser.Scene {
         this.links = {}
 
         this.active = true
+        this.resizeables = []
     }
 
     async init(data: { gameLevel: GameLevel; isLevelEditor?: boolean; fromLink?: boolean }) {
@@ -37,24 +49,44 @@ export default class LevelScene extends Phaser.Scene {
         this.active = true
         this.isLevelEditor = data.isLevelEditor || false
         this.fromLink = data.fromLink || false
+
+        this.gridManager = new GridManager(
+            this.cameras.main.width,
+            this.cameras.main.height,
+            this.level
+        )
     }
 
-    addBlock(type: string, gridX: number, gridY: number) {
-        const block = this.blockFactory.createBlockFromCode(
-            type,
-            this,
-            cellSize * gridX + cellSize / 2,
-            cellSize * gridY + cellSize / 2
-        )
+    placeBlock(blockData: BlockData) {
+        const c = this.gridManager.gridToPhaser(new Phaser.Math.Vector2(blockData.x, blockData.y))
+        const block = this.blockFactory.createBlockFromCode(blockData.code, this, c.x, c.y)
+        block.setDisplaySize(this.gridManager.cellSize, this.gridManager.cellSize)
 
-        if (isPickup(type)) {
+        if (isPickup(blockData.code)) {
             this.pickups.add(block)
         } else {
             this.blocks.add(block)
         }
-        block.body.setSize(cellSize, cellSize)
+        block.body.setSize(this.gridManager.cellSize, this.gridManager.cellSize)
 
+        // console.log(blockData.x, blockData.y, block.gridCoordinates)
+        this.ensureBlockLinked(block, blockData)
         return block
+    }
+
+    ensureBlockLinked(block: Block, blockData: BlockData) {
+        if (blockData.linkCode !== undefined) {
+            if (!this.links[blockData.linkCode]) {
+                this.links[blockData.linkCode] = []
+            }
+
+            this.links[blockData.linkCode].forEach(strategy => {
+                strategy.link(block.strategy)
+                block.strategy.link(strategy)
+            })
+
+            this.links[blockData.linkCode].push(block.strategy)
+        }
     }
 
     setKiller(x: number, y: number) {
@@ -63,19 +95,35 @@ export default class LevelScene extends Phaser.Scene {
 
     checkFallOutOfWorld() {
         let falling = true
-        const playerPosition = new Phaser.Math.Vector2(
-            Math.round(this.player.x - cellSize / 2),
-            Math.round(this.player.y - cellSize / 2)
-        )
+        const p = this.gridManager.phaserToGrid(this.player.body.position)
+        // const playerPosition = new Phaser.Math.Vector2(
+        //     Math.round(this.player.x - cellSize / 2),
+        //     Math.round(this.player.y - cellSize / 2)
+        // )
         this.blocks.children.iterate(block => {
-            const v = new Phaser.Math.Vector2(
-                block.body.position.x - playerPosition.x,
-                block.body.position.y - playerPosition.y
-            ).normalize()
+            const b = this.gridManager.phaserToGrid(block.body.position as Phaser.Math.Vector2)
+            const v = new Phaser.Math.Vector2(b.x - p.x, b.y - p.y).normalize()
             if (this.player.body.velocity.clone().normalize().fuzzyEquals(v)) {
                 falling = false
+                console.log('not falling')
             }
         })
+        // let falling = true
+        // // const playerPosition = this.gridManager.phaserToGrid(new Phaser.Math.Vector2(this.player.x, this.player.y))
+        // // const playerPosition = new Phaser.Math.Vector2(
+        // //     Math.round(this.player.x - cellSize / 2),
+        // //     Math.round(this.player.y - cellSize / 2)
+        // // )
+        // this.blocks.children.iterate(block => {
+        //     console.log(this.player.x, this.player.y, block.body.position.x, block.body.position.y)
+        //     const v = new Phaser.Math.Vector2(
+        //         block.body.position.x - this.player.body.position.x,
+        //         block.body.position.y - this.player.body.position.y
+        //     ).normalize()
+        //     if (this.player.body.velocity.clone().normalize().fuzzyEquals(v)) {
+        //         falling = false
+        //     }
+        // })
         if (falling) {
             this.tweens.add({
                 targets: this.player,
@@ -90,12 +138,10 @@ export default class LevelScene extends Phaser.Scene {
     }
 
     setPlayer(gridX: number, gridY: number) {
-        this.player = new Player(
-            this,
-            gridX * cellSize + cellSize / 2,
-            gridY * cellSize + cellSize / 2
-        )
+        const c = this.gridManager.gridToPhaser(new Phaser.Math.Vector2(gridX, gridY))
+        this.player = new Player(this, c.x, c.y)
         this.entities.add(this.player)
+        this.player.setDisplaySize(this.gridManager.cellSize, this.gridManager.cellSize)
     }
 
     create() {
@@ -105,14 +151,15 @@ export default class LevelScene extends Phaser.Scene {
             collideWorldBounds: false
         })
 
+        this.resizeables = []
         this.level.blocks.forEach(blockRaw => {
-            const block = this.addBlock(blockRaw.code, blockRaw.x, blockRaw.y)
+            const block = this.placeBlock(blockRaw)
             if (blockRaw.x === this.killBlock?.x && blockRaw.y === this.killBlock.y) {
                 if (!block.hasTween) {
                     block.scene.tweens.add({
                         targets: block,
-                        scaleX: 0.3,
-                        scaleY: 0.3,
+                        scaleX: '*=0.5',
+                        scaleY: '*=0.5',
                         alpha: 0.5,
                         duration: 100,
                         ease: 'Power2',
@@ -127,19 +174,7 @@ export default class LevelScene extends Phaser.Scene {
                 }
                 this.killBlock = undefined
             }
-
-            if (blockRaw.linkCode !== undefined) {
-                if (!this.links[blockRaw.linkCode]) {
-                    this.links[blockRaw.linkCode] = []
-                }
-
-                this.links[blockRaw.linkCode].forEach(strategy => {
-                    strategy.link(block.strategy)
-                    block.strategy.link(strategy)
-                })
-
-                this.links[blockRaw.linkCode].push(block.strategy)
-            }
+            this.resizeables.push(block)
         })
 
         this.setPlayer(this.level.playerStart.x, this.level.playerStart.y)
@@ -147,6 +182,8 @@ export default class LevelScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.blocks, (p, b) => {
             const block = b as Block
             const player = p as Player
+
+            // console.log(player.width, player.height, player.displayWidth, player.displayHeight)
 
             block.collide(player)
         })
@@ -198,11 +235,56 @@ export default class LevelScene extends Phaser.Scene {
         cursors.down.addListener('down', model.down)
 
         this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
-            model['down']()
             if (event.key === 'Escape') {
                 this.onMenu()
             }
         })
+
+        this.scale.removeListener('resize', this.onResize, this)
+        this.scale.on('resize', this.onResize, this)
+    }
+
+    onResize(gameSize: Bounds, baseSize: Bounds, displaySize: Bounds) {
+        // console.log('yeeeeup')
+        // // if (this.timeout) {
+        // //     clearTimeout(this.timeout)
+        // // }
+        // // this.timeout = setTimeout(() => {
+        // // console.log('resizing')
+        // // console.log(gameSize, baseSize, displaySize)
+        // // console.log(this.cameras.main.width, this.cameras.main.height)
+        // const playerPos = this.player.gridCoordinates
+        // // console.log(playerPos)
+        // const blocksAndCoords = this.resizeables
+        //     .filter(block => block.active)
+        //     .map(block => ({
+        //         block,
+        //         coords: block.gridCoordinates
+        //     }))
+        // this.gridManager.setDimensions(this.cameras.main.width, this.cameras.main.height)
+
+        // blocksAndCoords.forEach(({ block, coords }) => {
+        //     this.gridManager.resize(block)
+        //     this.gridManager.reposition(block, coords)
+        // })
+        // this.gridManager.resize(this.player)
+        // this.gridManager.reposition(this.player, playerPos)
+        // this.player.speed = this.gridManager.cellSize * 10
+        // // console.log(playerPos)
+        // // console.log(
+        // //     this.player.displayWidth,
+        // //     this.player.displayHeight,
+        // //     blocksAndCoords[0].block.displayWidth,
+        // //     blocksAndCoords[0].block.displayHeight
+        // // )
+        // this.redraw()
+        // // }, 500)
+        this.scene.restart()
+    }
+
+    redraw() {
+        // set the size and the position of each block based on its raw data, making sure that we only set those which still exist
+        // set the size and the position of the player based on the grid area that they are in
     }
 
     onMenu(wonLevel = false) {
