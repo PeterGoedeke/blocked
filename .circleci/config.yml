@@ -6,6 +6,7 @@ version: 2.1
 orbs:
   node: circleci/node@4.7
   aws-s3: circleci/aws-s3@3.0
+  aws-cli: circleci/aws-cli@2.0
 
 jobs:
   build:
@@ -34,6 +35,19 @@ jobs:
           aws-secret-access-key: AWS_SECRET_KEY
           from: dist
           to: 's3://blocked-game'
+  
+  invalidate:
+    docker:
+      - image: 'cimg/python:3.6'
+    steps:
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY
+          aws-region: AWS_REGION
+          aws-secret-access-key: AWS_SECRET_KEY
+      - run:
+          name: Invalidate Cloudfront distribution
+          command: |
+            aws cloudfront create-invalidation --distribution-id=$CLOUDFRONT_ID --paths=/*
 
 workflows:
   sample:
@@ -43,3 +57,7 @@ workflows:
       - deploy:
           requires:
             - build
+      - invalidate:
+          requires:
+            - deploy
+            
