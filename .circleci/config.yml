@@ -1,0 +1,45 @@
+# This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
+version: 2.1
+
+# Orbs are reusable packages of CircleCI configuration that you may share across projects, enabling you to create encapsulated, parameterized commands, jobs, and executors that can be used across multiple projects.
+# See: https://circleci.com/docs/2.0/orb-intro/
+orbs:
+  node: circleci/node@4.7
+  aws-s3: circleci/aws-s3@3.0
+
+jobs:
+  build:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-npm
+      - node/install-packages
+      - run:
+          name: Bundle
+          command: npm run bundle
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  
+  deploy:
+    docker:
+      - image: 'cimg/python:3.6'
+    steps:
+      - attach_workspace:
+          at: .
+      - aws-s3/sync:
+          aws-access-key-id: AWS_ACCESS_KEY
+          aws-region: AWS_REGION
+          aws-secret-access-key: AWS_SECRET_KEY
+          from: dist
+          to: 's3://blocked-game'
+
+workflows:
+  sample:
+    jobs:
+      - node/test
+      - build
+      - deploy:
+          requires:
+            - build
