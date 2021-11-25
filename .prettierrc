@@ -4,5 +4,13 @@
     "singleQuote": true,
     "trailingComma": "none",
     "semi": false,
-    "arrowParens": "avoid"
+    "arrowParens": "avoid",
+    "overrides": [
+        {
+            "files": ["*.yml", "*.yaml"],
+            "options": {
+                "tabWidth": 2
+            }
+        }
+    ]
 }
