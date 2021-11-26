@@ -6,7 +6,7 @@ orbs:
   aws-cli: circleci/aws-cli@2.0
 
 jobs:
-  build:
+  build-deploy:
     executor: node/default
     steps:
       - checkout
