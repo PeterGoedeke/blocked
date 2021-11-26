@@ -15,19 +15,7 @@ jobs:
       - run:
           name: Bundle
           command: npm run bundle
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-
-  deploy:
-    docker:
-      - image: 'cimg/python:3.6'
-    steps:
-      - attach_workspace:
-          at: .
       - aws-s3/sync:
-          context: aws-creds
           from: dist
           to: 's3://blocked-game'
 
@@ -46,14 +34,15 @@ workflows:
   sample:
     jobs:
       - node/test
-      - build:
+      - build-deploy:
+          context: aws-creds
+          requires:
+            - node/test
           filters:
             branches:
               only:
                 - main
-      - deploy:
-          requires:
-            - build
       - invalidate:
+          context: aws-creds
           requires:
-            - deploy
+            - build-deploy
