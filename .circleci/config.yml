@@ -23,8 +23,7 @@ jobs:
     docker:
       - image: 'cimg/python:3.6'
     steps:
-      - aws-cli/setup:
-          context: aws-creds
+      - aws-cli/setup
       - run:
           name: Invalidate Cloudfront distribution
           command: |
