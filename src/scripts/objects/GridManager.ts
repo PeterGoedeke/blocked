@@ -70,8 +70,8 @@ export default class GridManager {
         const realWidth = this.level.width * this.cellSize
         const realHeight = this.level.height * this.cellSize
 
-        this.xOffset = (width - realWidth) / 2
-        this.yOffset = (height - realHeight) / 2
+        this.xOffset = Math.floor((width - realWidth) / 2)
+        this.yOffset = Math.floor((height - realHeight) / 2)
     }
 
     resize(griddable: Phaser.Physics.Arcade.Image) {
